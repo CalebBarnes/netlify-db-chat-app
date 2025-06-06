@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import ThemeToggle from './ThemeToggle'
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -558,6 +559,7 @@ function App() {
             <p>Welcome, <strong>{username}</strong>!</p>
           </div>
           <div className="header-right">
+            <ThemeToggle />
             <div className="user-count">
               👥 {onlineUsers.length} online
             </div>
