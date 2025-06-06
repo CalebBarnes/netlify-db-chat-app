@@ -125,6 +125,9 @@ function App() {
   const [typingUsers, setTypingUsers] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
+
+  // Reply functionality state
+  const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
   const messagesEndRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
@@ -444,7 +447,10 @@ function App() {
         },
         body: JSON.stringify({
           username: username.trim(),
-          message: newMessage.trim()
+          message: newMessage.trim(),
+          replyToId: replyingTo?.id || null,
+          replyToUsername: replyingTo?.username || null,
+          replyPreview: replyingTo?.message || null
         }),
       })
 
@@ -459,6 +465,7 @@ function App() {
       lastMessageTimeRef.current = message.created_at
       lastMessageIdRef.current = message.id
       setNewMessage('')
+      setReplyingTo(null) // Clear reply state after sending
     } catch (err) {
       console.error('Error sending message:', err)
       setError('Failed to send message. Please try again.')
@@ -499,6 +506,21 @@ function App() {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // Reply functionality handlers
+  const handleReply = (message) => {
+    setReplyingTo({
+      id: message.id,
+      username: message.username,
+      message: message.message.substring(0, 100) // Preview first 100 chars
+    })
+    // Focus the input field
+    document.querySelector('.message-input')?.focus()
+  }
+
+  const cancelReply = () => {
+    setReplyingTo(null)
   }
 
   if (loading) {
@@ -632,11 +654,30 @@ function App() {
               messages.map(message => (
                 <div
                   key={message.id}
-                  className={`message ${message.username === username ? 'own-message' : ''}`}
+                  className={`message ${message.username === username ? 'own-message' : ''} ${message.reply_to_id ? 'reply-message' : ''}`}
                 >
+                  {/* Show reply reference if this is a reply */}
+                  {message.reply_to_id && (
+                    <div className="reply-reference">
+                      <span className="reply-icon">↳</span>
+                      <span className="reply-to">
+                        Replying to <strong>@{message.reply_to_username}</strong>:
+                        <span className="reply-preview">{message.reply_preview}</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div className="message-header">
                     <span className="message-username">{message.username}</span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
+                    <button
+                      className="reply-btn"
+                      onClick={() => handleReply(message)}
+                      title={`Reply to ${message.username}`}
+                      aria-label={`Reply to ${message.username}'s message`}
+                    >
+                      ↩️
+                    </button>
                   </div>
                   <div
                     className="message-content"
@@ -700,6 +741,27 @@ function App() {
       </div>
 
       <form className="message-form" onSubmit={sendMessage}>
+        {/* Reply preview */}
+        {replyingTo && (
+          <div className="reply-preview">
+            <div className="reply-preview-content">
+              <span className="reply-preview-label">
+                Replying to <strong>@{replyingTo.username}</strong>:
+              </span>
+              <span className="reply-preview-text">{replyingTo.message}</span>
+            </div>
+            <button
+              type="button"
+              className="reply-cancel-btn"
+              onClick={cancelReply}
+              aria-label="Cancel reply"
+              title="Cancel reply"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Typing indicators - dedicated space with no layout shift */}
         <div
           className={`typing-indicator-dedicated ${typingUsers.length > 0 ? 'visible' : 'hidden'}`}
