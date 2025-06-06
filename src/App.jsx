@@ -24,6 +24,15 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Load saved username from localStorage on app startup
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('chatapp-username')
+    if (savedUsername && savedUsername.trim()) {
+      setUsername(savedUsername.trim())
+      setIsUsernameSet(true)
+    }
+  }, [])
+
   // Fetch initial messages on component mount
   useEffect(() => {
     fetchMessages()
@@ -253,6 +262,8 @@ function App() {
     e.preventDefault()
     if (!username.trim()) return
 
+    // Save username to localStorage for persistence
+    localStorage.setItem('chatapp-username', username.trim())
     setIsUsernameSet(true)
     setError(null)
   }
@@ -309,6 +320,20 @@ function App() {
     }
   }
 
+  const handleLogout = () => {
+    // Clear saved username from localStorage
+    localStorage.removeItem('chatapp-username')
+    // Remove presence from server
+    removePresence()
+    // Reset state
+    setUsername('')
+    setIsUsernameSet(false)
+    setMessages([])
+    setOnlineUsers([])
+    setTypingUsers([])
+    setError(null)
+  }
+
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -349,6 +374,9 @@ function App() {
               Join Chat
             </button>
           </div>
+          <p className="profile-persistence-info">
+            💾 Your username will be saved for future visits
+          </p>
         </form>
 
         {error && (
@@ -372,6 +400,14 @@ function App() {
             <div className="user-count">
               👥 {onlineUsers.length} online
             </div>
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              aria-label="Logout and clear saved profile"
+              title="Logout"
+            >
+              🚪
+            </button>
             <button
               className="sidebar-toggle"
               onClick={() => setShowSidebar(!showSidebar)}
