@@ -523,20 +523,34 @@ body {
   .app {
     margin: 0;
     border-radius: 0;
+    height: 100vh; /* Full viewport height on mobile */
+    min-height: 100vh;
+  }
+
+  /* URGENT: Massive header size fix - reduce from 20px 30px to minimal */
+  .header {
+    padding: 12px 16px; /* Reduced from 20px 30px - 40% smaller! */
   }
 
   .header h1 {
-    font-size: 1.8rem;
+    font-size: 1.4rem; /* Reduced from 1.8rem for compact mobile header */
+    margin-bottom: 2px; /* Tighter spacing */
+  }
+
+  .header p {
+    font-size: 0.85rem; /* Smaller subtitle */
+    margin: 0;
   }
 
   .header-content {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
+    flex-direction: row; /* Keep horizontal on mobile for space efficiency */
+    gap: 8px; /* Reduced gap */
+    align-items: center; /* Center align for compact look */
+    min-height: 36px; /* Ensure minimum touch target */
   }
 
   .header-right {
-    align-self: flex-end;
+    align-self: center; /* Center align with content */
   }
 
   /* Mobile sidebar backdrop */
@@ -598,11 +612,35 @@ body {
   }
 
   .username-form, .message-form {
-    padding: 15px 20px;
+    padding: 12px 16px; /* Reduced padding for mobile efficiency */
   }
 
   .messages-list {
-    padding: 15px 20px;
+    padding: 12px 16px; /* Reduced from 15px 20px for better space usage */
+  }
+
+  /* iMessage-style mobile optimizations */
+  .message {
+    margin-bottom: 8px; /* Reduced from 20px - much tighter spacing like iMessage */
+    max-width: 85%; /* Better mobile width - more space efficient */
+  }
+
+  .message-content {
+    padding: 10px 14px; /* Slightly reduced padding for mobile */
+    border-radius: 16px; /* More rounded like iMessage bubbles */
+    font-size: 15px; /* Slightly smaller for mobile readability */
+  }
+
+  /* Enhanced bubble design for mobile */
+  .own-message .message-content {
+    border-radius: 16px 16px 4px 16px; /* iMessage-style tail on bottom right */
+    background: #007AFF; /* iOS blue color */
+  }
+
+  .message:not(.own-message) .message-content {
+    border-radius: 16px 16px 16px 4px; /* iMessage-style tail on bottom left */
+    background: #E5E5EA; /* iOS gray color */
+    color: #000; /* Black text on gray background */
   }
 
   .input-group {
@@ -610,18 +648,44 @@ body {
     gap: 10px;
   }
 
+  /* Better mobile input experience - iMessage style */
+  .message-input {
+    padding: 12px 16px; /* Comfortable touch target */
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 20px; /* More rounded like iMessage input */
+    border: 2px solid #e1e5e9;
+  }
+
+  .message-input:focus {
+    border-color: #007AFF; /* iOS blue focus color */
+  }
+
+  .join-btn, .send-btn {
+    padding: 12px 20px; /* Better touch targets (min 44px) */
+    border-radius: 20px; /* Rounded buttons like iOS */
+    font-size: 15px;
+    min-height: 44px; /* iOS touch target minimum */
+    background: #007AFF; /* iOS blue */
+    border: none;
+    color: white;
+  }
+
+  .join-btn:hover, .send-btn:hover {
+    background: #0056b3; /* Darker blue on hover */
+  }
+
   .user-count {
     display: none;
   }
 
   .typing-indicator-dedicated {
-    min-height: 36px; /* Slightly smaller on mobile */
-    padding: 6px 15px;
-    margin-bottom: 6px;
+    min-height: 32px; /* Smaller on mobile to save space */
+    padding: 4px 16px; /* Reduced padding */
+    margin-bottom: 4px; /* Tighter spacing */
   }
 
   .typing-content {
-    font-size: 13px;
+    font-size: 12px; /* Smaller typing indicator */
   }
 }
 
@@ -630,12 +694,37 @@ body {
     width: 200px;
   }
 
+  /* Ultra-compact header for small mobile screens */
+  .header {
+    padding: 10px 12px; /* Even more compact on small screens */
+  }
+
   .header h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* Smaller title for tiny screens */
+    margin-bottom: 1px;
   }
 
   .header p {
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Smaller subtitle */
+  }
+
+  /* Tighter message spacing on small screens */
+  .message {
+    margin-bottom: 6px; /* Even tighter spacing */
+    max-width: 90%; /* Use more screen width on tiny screens */
+  }
+
+  .message-content {
+    padding: 8px 12px; /* Smaller padding for tiny screens */
+    font-size: 14px; /* Smaller text for readability */
+  }
+
+  .username-form, .message-form {
+    padding: 10px 12px; /* Minimal padding on small screens */
+  }
+
+  .messages-list {
+    padding: 10px 12px; /* Minimal padding */
   }
 }
 
