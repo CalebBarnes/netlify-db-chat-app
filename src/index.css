@@ -1114,10 +1114,21 @@ body {
     /* Fix for Android Chrome text selection */
     -webkit-text-size-adjust: 100%; /* Prevent text size adjustment */
     text-size-adjust: 100%; /* Standard property */
+
+    /* Additional Android Chrome fixes */
+    -webkit-rtl-ordering: logical; /* Ensure proper text direction */
+    -webkit-user-modify: read-write-plaintext-only; /* Allow text editing */
+    -webkit-writing-mode: horizontal-tb; /* Ensure horizontal text flow */
+    writing-mode: horizontal-tb; /* Standard property */
+    text-align: left; /* Ensure left alignment for cursor positioning */
+    direction: ltr; /* Left-to-right text direction */
+    resize: none; /* Prevent resizing */
+    overflow: visible; /* Ensure text is visible */
+    -webkit-text-stroke: 0; /* Remove text stroke that can interfere */
   }
 
   .message-input:focus {
-    border-color: #007AFF; /* iOS blue focus color */
+    border-color: var(--primary-color, #007AFF); /* Use theme variable with fallback */
 
     /* Enhanced focus state for better mobile experience */
     outline: none; /* Remove default outline */
@@ -1160,29 +1171,7 @@ body {
     font-size: 12px; /* Smaller typing indicator */
   }
 
-  /* Android-specific fixes for text selection and cursor positioning */
-  .message-input {
-    /* Additional Android Chrome fixes */
-    -webkit-rtl-ordering: logical; /* Ensure proper text direction */
 
-    /* Fix for Android text selection issues */
-    -webkit-user-modify: read-write-plaintext-only; /* Allow text editing */
-
-    /* Ensure proper input behavior on Android */
-    -webkit-writing-mode: horizontal-tb; /* Ensure horizontal text flow */
-    writing-mode: horizontal-tb; /* Standard property */
-
-    /* Fix cursor positioning on Android */
-    text-align: left; /* Ensure left alignment for cursor positioning */
-    direction: ltr; /* Left-to-right text direction */
-
-    /* Prevent Android keyboard from affecting layout */
-    resize: none; /* Prevent resizing */
-    overflow: visible; /* Ensure text is visible */
-
-    /* Fix for Android Chrome input selection */
-    -webkit-text-stroke: 0; /* Remove text stroke that can interfere */
-  }
 }
 
 @media (max-width: 480px) {

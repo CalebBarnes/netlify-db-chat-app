@@ -737,7 +737,7 @@ function App() {
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
-            spellCheck="false"
+            spellCheck={false}
             inputMode="text"
           />
           <button
