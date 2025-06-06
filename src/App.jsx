@@ -57,6 +57,11 @@ const showMentionNotification = (sender, message) => {
   }
 }
 
+// Escape special regex characters in username
+const escapeRegex = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 // Secure markdown renderer with DOMPurify sanitization and mention highlighting
 const renderMarkdown = (text, currentUser = '') => {
   if (!text) return ''
@@ -65,8 +70,11 @@ const renderMarkdown = (text, currentUser = '') => {
     // First highlight @mentions before markdown processing
     let processedText = text
     if (currentUser) {
+      // Escape special regex characters in username for safe regex construction
+      const escapedUser = escapeRegex(currentUser)
+
       // Highlight mentions of the current user
-      const mentionRegex = new RegExp(`@(${currentUser})\\b`, 'gi')
+      const mentionRegex = new RegExp(`@(${escapedUser})\\b`, 'gi')
       processedText = processedText.replace(mentionRegex, '<mark class="mention-highlight">@$1</mark>')
 
       // Highlight other mentions with a different style
