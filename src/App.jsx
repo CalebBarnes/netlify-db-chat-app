@@ -129,6 +129,7 @@ function App() {
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
   const messagesEndRef = useRef(null)
+  const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
   const typingTimeoutRef = useRef(null)
@@ -465,6 +466,11 @@ function App() {
       lastMessageTimeRef.current = message.created_at
       lastMessageIdRef.current = message.id
       setNewMessage('')
+
+      // Remove highlighting from any message being replied to
+      document.querySelectorAll('.message.being-replied-to').forEach(el => {
+        el.classList.remove('being-replied-to')
+      })
       setReplyingTo(null) // Clear reply state after sending
     } catch (err) {
       console.error('Error sending message:', err)
@@ -515,12 +521,46 @@ function App() {
       username: message.username,
       message: message.message.substring(0, 100) // Preview first 100 chars
     })
+
+    // Highlight the message being replied to
+    const messageElement = document.querySelector(`[data-message-id="${message.id}"]`)
+    if (messageElement) {
+      // Remove any existing highlights first
+      document.querySelectorAll('.message.being-replied-to').forEach(el => {
+        el.classList.remove('being-replied-to')
+      })
+
+      // Add highlight to the message being replied to
+      messageElement.classList.add('being-replied-to')
+    }
+
     // Focus the input field
-    document.querySelector('.message-input')?.focus()
+    messageInputRef.current?.focus()
   }
 
   const cancelReply = () => {
+    // Remove highlighting from any message being replied to
+    document.querySelectorAll('.message.being-replied-to').forEach(el => {
+      el.classList.remove('being-replied-to')
+    })
     setReplyingTo(null)
+  }
+
+  // Scroll to original message when reply reference is clicked
+  const scrollToMessage = (messageId) => {
+    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`)
+    if (messageElement) {
+      messageElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+
+      // Temporarily highlight the message
+      messageElement.classList.add('being-replied-to')
+      setTimeout(() => {
+        messageElement.classList.remove('being-replied-to')
+      }, 2000)
+    }
   }
 
   if (loading) {
@@ -654,14 +694,19 @@ function App() {
               messages.map(message => (
                 <div
                   key={message.id}
-                  className={`message ${message.username === username ? 'own-message' : ''} ${message.reply_to_id ? 'reply-message' : ''}`}
+                  data-message-id={message.id}
+                  className={`message ${message.username === username ? 'own-message' : ''}`}
                 >
-                  {/* Show reply reference if this is a reply */}
+                  {/* Show compact reply reference if this is a reply - Discord style */}
                   {message.reply_to_id && (
-                    <div className="reply-reference">
+                    <div
+                      className="reply-reference"
+                      onClick={() => scrollToMessage(message.reply_to_id)}
+                      title="Click to jump to original message"
+                    >
                       <span className="reply-icon">↳</span>
                       <span className="reply-to">
-                        Replying to <strong>@{message.reply_to_username}</strong>:
+                        <strong>@{message.reply_to_username}</strong>
                         <span className="reply-preview">{message.reply_preview}</span>
                       </span>
                     </div>
@@ -789,6 +834,7 @@ function App() {
 
         <div className="input-group">
           <input
+            ref={messageInputRef}
             type="text"
             className="message-input"
             placeholder="Type your message..."

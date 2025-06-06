@@ -64,7 +64,7 @@ export const handler = async (event) => {
           body: JSON.stringify(messages),
         };
 
-      case "POST":
+      case "POST": {
         // Send a new message
         const { username, message, replyToId, replyToUsername, replyPreview } =
           JSON.parse(body);
@@ -108,14 +108,29 @@ export const handler = async (event) => {
         }
 
         // Validate reply data if provided
-        if (replyToId && (!replyToUsername || !replyPreview)) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({
-              error: "Reply requires both username and preview",
-            }),
-          };
+        if (replyToId) {
+          // Ensure replyToId is a valid integer
+          const replyId = parseInt(replyToId);
+          if (isNaN(replyId) || replyId <= 0) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({
+                error: "Reply ID must be a valid positive integer",
+              }),
+            };
+          }
+
+          // Ensure reply metadata is provided
+          if (!replyToUsername || !replyPreview) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({
+                error: "Reply requires both username and preview",
+              }),
+            };
+          }
         }
 
         const [newMessage] = await sql`
@@ -131,6 +146,7 @@ export const handler = async (event) => {
           headers,
           body: JSON.stringify(newMessage),
         };
+      }
 
       default:
         return {
