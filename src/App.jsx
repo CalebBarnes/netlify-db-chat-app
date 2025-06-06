@@ -737,8 +737,10 @@ function App() {
             type="submit"
             className="send-btn"
             disabled={submitting || !newMessage.trim()}
+            aria-label={submitting ? 'Sending message...' : 'Send message'}
+            title={submitting ? 'Sending...' : 'Send'}
           >
-            {submitting ? 'Sending...' : 'Send'}
+            {submitting ? '⏳' : '➤'}
           </button>
         </div>
       </form>

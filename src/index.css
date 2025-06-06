@@ -224,17 +224,24 @@ body {
 }
 
 .message-content {
-  background: #f1f3f4;
+  background: #E5E5EA; /* iOS gray for received messages */
   padding: 12px 16px;
   border-radius: 18px;
   font-size: 16px;
   line-height: 1.4;
   word-wrap: break-word;
+  color: #000; /* Black text for received messages */
+  max-width: 85%; /* Better mobile space usage */
 }
 
 .own-message .message-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #007AFF; /* iOS blue for sent messages */
   color: white;
+  border-radius: 18px 18px 4px 18px; /* iMessage tail on bottom right */
+}
+
+.message:not(.own-message) .message-content {
+  border-radius: 18px 18px 18px 4px; /* iMessage tail on bottom left */
 }
 
 @keyframes fadeIn {
@@ -520,23 +527,49 @@ body {
 }
 
 @media (max-width: 768px) {
-  .app {
+  /* Fix mobile viewport issues - eliminate purple background */
+  body {
     margin: 0;
+    padding: 0 !important; /* Override the 20px padding that causes purple edges */
+    overflow-x: hidden;
+  }
+
+  .app {
+    margin: 0 !important; /* Force remove any margins */
+    padding: 0;
     border-radius: 0;
+    height: 100vh; /* Full viewport height on mobile */
+    min-height: 100vh;
+    width: 100vw; /* Full viewport width */
+    max-width: 100vw;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  /* URGENT: Massive header size fix - reduce from 20px 30px to minimal */
+  .header {
+    padding: 12px 16px; /* Reduced from 20px 30px - 40% smaller! */
   }
 
   .header h1 {
-    font-size: 1.8rem;
+    font-size: 1.4rem; /* Reduced from 1.8rem for compact mobile header */
+    margin-bottom: 2px; /* Tighter spacing */
+  }
+
+  .header p {
+    font-size: 0.85rem; /* Smaller subtitle */
+    margin: 0;
   }
 
   .header-content {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
+    flex-direction: row; /* Keep horizontal on mobile for space efficiency */
+    gap: 8px; /* Reduced gap */
+    align-items: center; /* Center align for compact look */
+    min-height: 36px; /* Ensure minimum touch target */
   }
 
   .header-right {
-    align-self: flex-end;
+    align-self: center; /* Center align with content */
   }
 
   /* Mobile sidebar backdrop */
@@ -598,16 +631,104 @@ body {
   }
 
   .username-form, .message-form {
-    padding: 15px 20px;
+    padding: 12px 16px; /* Reduced padding for mobile efficiency */
   }
 
   .messages-list {
-    padding: 15px 20px;
+    padding: 12px 16px; /* Reduced from 15px 20px for better space usage */
+    display: flex;
+    flex-direction: column; /* Stack messages vertically like iMessage */
+  }
+
+  /* iMessage-style mobile optimizations */
+  .message {
+    margin-bottom: 2px; /* Very tight iMessage-style spacing */
+    max-width: 85%; /* Better mobile width - more space efficient */
+  }
+
+  /* iMessage-style consecutive message grouping */
+  .message + .message {
+    margin-top: 1px; /* Minimal gap between consecutive messages */
+  }
+
+  /* Larger gap between different users - like iMessage */
+  .message:not(.own-message) + .message.own-message,
+  .message.own-message + .message:not(.own-message) {
+    margin-top: 16px; /* Clear separation between different users */
+  }
+
+  .message-content {
+    padding: 10px 14px; /* Slightly reduced padding for mobile */
+    border-radius: 16px; /* More rounded like iMessage bubbles */
+    font-size: 15px; /* Slightly smaller for mobile readability */
+  }
+
+  /* Enhanced bubble design for mobile - EXACT iMessage style */
+  .own-message {
+    align-self: flex-end; /* Right align like iMessage sent messages */
+    margin-left: 20%; /* Create space on left like iMessage */
+  }
+
+  .own-message .message-content {
+    border-radius: 18px 18px 4px 18px; /* iMessage-style tail on bottom right */
+    background: #007AFF; /* iOS blue color */
+    margin-left: auto; /* Push to right */
+  }
+
+  .message:not(.own-message) {
+    align-self: flex-start; /* Left align like iMessage received messages */
+    margin-right: 20%; /* Create space on right like iMessage */
+  }
+
+  .message:not(.own-message) .message-content {
+    border-radius: 18px 18px 18px 4px; /* iMessage-style tail on bottom left */
+    background: #E5E5EA; /* iOS gray color */
+    color: #000; /* Black text on gray background */
+    margin-right: auto; /* Push to left */
   }
 
   .input-group {
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row; /* Put send button next to input like iMessage */
+    gap: 8px; /* Tight spacing between input and button */
+    align-items: flex-end; /* Align button to bottom of input */
+  }
+
+  .message-input {
+    flex: 1; /* Input takes most of the space */
+  }
+
+  /* Better mobile input experience - iMessage style */
+  .message-input {
+    padding: 12px 16px; /* Comfortable touch target */
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 20px; /* More rounded like iMessage input */
+    border: 2px solid #e1e5e9;
+  }
+
+  .message-input:focus {
+    border-color: #007AFF; /* iOS blue focus color */
+  }
+
+  .join-btn, .send-btn {
+    padding: 12px; /* Square padding for icon button */
+    border-radius: 50%; /* Circular button like iMessage */
+    font-size: 18px; /* Larger icon size */
+    min-height: 44px; /* iOS touch target minimum */
+    min-width: 44px; /* Perfect circle */
+    width: 44px; /* Fixed width for circle */
+    height: 44px; /* Fixed height for circle */
+    background: #007AFF; /* iOS blue */
+    border: none;
+    color: white;
+    flex-shrink: 0; /* Don't shrink the button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .join-btn:hover, .send-btn:hover {
+    background: #0056b3; /* Darker blue on hover */
   }
 
   .user-count {
@@ -615,13 +736,13 @@ body {
   }
 
   .typing-indicator-dedicated {
-    min-height: 36px; /* Slightly smaller on mobile */
-    padding: 6px 15px;
-    margin-bottom: 6px;
+    min-height: 32px; /* Smaller on mobile to save space */
+    padding: 4px 16px; /* Reduced padding */
+    margin-bottom: 4px; /* Tighter spacing */
   }
 
   .typing-content {
-    font-size: 13px;
+    font-size: 12px; /* Smaller typing indicator */
   }
 }
 
@@ -630,12 +751,37 @@ body {
     width: 200px;
   }
 
+  /* Ultra-compact header for small mobile screens */
+  .header {
+    padding: 10px 12px; /* Even more compact on small screens */
+  }
+
   .header h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* Smaller title for tiny screens */
+    margin-bottom: 1px;
   }
 
   .header p {
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Smaller subtitle */
+  }
+
+  /* Tighter message spacing on small screens */
+  .message {
+    margin-bottom: 6px; /* Even tighter spacing */
+    max-width: 90%; /* Use more screen width on tiny screens */
+  }
+
+  .message-content {
+    padding: 8px 12px; /* Smaller padding for tiny screens */
+    font-size: 14px; /* Smaller text for readability */
+  }
+
+  .username-form, .message-form {
+    padding: 10px 12px; /* Minimal padding on small screens */
+  }
+
+  .messages-list {
+    padding: 10px 12px; /* Minimal padding */
   }
 }
 
