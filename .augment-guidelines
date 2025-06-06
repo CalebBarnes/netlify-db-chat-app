@@ -38,6 +38,7 @@ This file contains important context and memories from previous interactions to 
 ## Development Environment
 - User prefers to use 'netlify dev' instead of 'npm dev' when running the development server for this Netlify project.
 - User prefers using Playwright to test applications and verify functionality after implementing changes.
+- When using Playwright to test or work on the app, I should check recent chat messages for any directed towards me (@Lumi mentions or replies) and interact with those users before continuing with development work.
 
 ## Technical Implementation Notes
 - This project uses Netlify DB for data persistence
