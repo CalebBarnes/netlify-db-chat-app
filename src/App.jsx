@@ -26,10 +26,14 @@ function App() {
 
   // Load saved username from localStorage on app startup
   useEffect(() => {
-    const savedUsername = localStorage.getItem('chatapp-username')
-    if (savedUsername && savedUsername.trim()) {
-      setUsername(savedUsername.trim())
-      setIsUsernameSet(true)
+    try {
+      const savedUsername = localStorage.getItem('chatapp-username')
+      if (savedUsername?.trim()) {
+        setUsername(savedUsername.trim())
+        setIsUsernameSet(true)
+      }
+    } catch (error) {
+      console.warn('Failed to load saved username from localStorage:', error)
     }
   }, [])
 
@@ -263,7 +267,11 @@ function App() {
     if (!username.trim()) return
 
     // Save username to localStorage for persistence
-    localStorage.setItem('chatapp-username', username.trim())
+    try {
+      localStorage.setItem('chatapp-username', username.trim())
+    } catch (error) {
+      console.warn('Failed to save username to localStorage:', error)
+    }
     setIsUsernameSet(true)
     setError(null)
   }
@@ -322,7 +330,11 @@ function App() {
 
   const handleLogout = () => {
     // Clear saved username from localStorage
-    localStorage.removeItem('chatapp-username')
+    try {
+      localStorage.removeItem('chatapp-username')
+    } catch (error) {
+      console.warn('Failed to remove username from localStorage:', error)
+    }
     // Remove presence from server
     removePresence()
     // Reset state
