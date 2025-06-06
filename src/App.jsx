@@ -12,9 +12,12 @@ function App() {
   const [lastMessageId, setLastMessageId] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState([])
   const [showSidebar, setShowSidebar] = useState(true)
+  const [typingUsers, setTypingUsers] = useState([])
+  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
+  const typingTimeoutRef = useRef(null)
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -50,7 +53,11 @@ function App() {
       return () => {
         clearInterval(messageInterval)
         clearInterval(presenceInterval)
-        // Remove user from presence when component unmounts
+        // Clear typing timeout and remove user from presence when component unmounts
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+        }
+        handleTypingStop()
         removePresence()
       }
     }
@@ -172,9 +179,60 @@ function App() {
       }
       const users = await response.json()
       setOnlineUsers(users)
+
+      // Extract typing users (excluding current user)
+      const currentlyTyping = users
+        .filter(user => user.is_typing && user.username !== username.trim())
+        .map(user => user.username)
+      setTypingUsers(currentlyTyping)
     } catch (err) {
       console.error('Error fetching online users:', err)
     }
+  }
+
+  const updateTypingStatus = async (typing) => {
+    if (!username.trim()) return
+
+    try {
+      await fetch('/api/presence', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          isTyping: typing
+        }),
+      })
+    } catch (err) {
+      console.error('Error updating typing status:', err)
+    }
+  }
+
+  const handleTypingStart = () => {
+    if (!isTyping) {
+      setIsTyping(true)
+      updateTypingStatus(true)
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+
+    // Set new timeout to stop typing after 3 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false)
+      updateTypingStatus(false)
+    }, 3000)
+  }
+
+  const handleTypingStop = () => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    setIsTyping(false)
+    updateTypingStatus(false)
   }
 
   const handleUsernameSubmit = (e) => {
@@ -192,6 +250,10 @@ function App() {
     try {
       setSubmitting(true)
       setError(null)
+
+      // Stop typing indicator when sending message
+      handleTypingStop()
+
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
@@ -219,6 +281,17 @@ function App() {
       setError('Failed to send message. Please try again.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleMessageInputChange = (e) => {
+    setNewMessage(e.target.value)
+
+    // Trigger typing indicator when user starts typing
+    if (e.target.value.trim().length > 0) {
+      handleTypingStart()
+    } else {
+      handleTypingStop()
     }
   }
 
@@ -325,6 +398,28 @@ function App() {
                 </div>
               ))
             )}
+
+            {/* Typing indicators */}
+            {typingUsers.length > 0 && (
+              <div className="typing-indicator">
+                <div className="typing-content">
+                  <div className="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <span className="typing-text">
+                    {typingUsers.length === 1
+                      ? `${typingUsers[0]} is typing...`
+                      : typingUsers.length === 2
+                      ? `${typingUsers[0]} and ${typingUsers[1]} are typing...`
+                      : `${typingUsers[0]} and ${typingUsers.length - 1} others are typing...`
+                    }
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -368,7 +463,7 @@ function App() {
             className="message-input"
             placeholder="Type your message..."
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={handleMessageInputChange}
             disabled={submitting}
             maxLength={1000}
           />

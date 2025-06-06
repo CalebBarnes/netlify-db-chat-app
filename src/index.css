@@ -358,6 +358,63 @@ body {
   color: #333;
 }
 
+/* Typing indicator styles */
+.typing-indicator {
+  padding: 10px 20px;
+  margin: 5px 0;
+  opacity: 0.8;
+}
+
+.typing-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #667eea;
+  border-radius: 50%;
+  animation: typing-pulse 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes typing-pulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.typing-text {
+  color: #667eea;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .app {
     margin: 0;
@@ -402,6 +459,14 @@ body {
 
   .user-count {
     display: none;
+  }
+
+  .typing-indicator {
+    padding: 8px 15px;
+  }
+
+  .typing-content {
+    font-size: 13px;
   }
 }
 

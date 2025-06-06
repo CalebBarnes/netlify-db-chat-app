@@ -75,8 +75,25 @@ async function runMigrations() {
       CREATE INDEX IF NOT EXISTS idx_user_presence_last_seen ON user_presence(last_seen DESC)
     `;
 
+    // Migration 003: Add typing indicators
+    console.log("Adding typing indicators to user_presence table...");
+    await sql`
+      ALTER TABLE user_presence
+      ADD COLUMN IF NOT EXISTS is_typing BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS typing_started_at TIMESTAMP WITH TIME ZONE
+    `;
+
+    console.log("Creating typing indicators index...");
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_user_presence_typing
+      ON user_presence(is_typing, typing_started_at)
+      WHERE is_typing = TRUE
+    `;
+
     console.log("✅ Migration completed successfully!");
-    console.log("🎉 Your chat app with user presence is ready to use!");
+    console.log(
+      "🎉 Your chat app with user presence is ready to use with typing indicators!"
+    );
   } catch (error) {
     console.error("❌ Migration failed:", error);
     process.exit(1);
