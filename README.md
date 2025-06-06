@@ -1,6 +1,6 @@
 # 💬 Real-Time Chat App with Netlify DB
 
-A modern, real-time chat application with user presence tracking, built with React and powered by Netlify DB (Neon PostgreSQL). Originally started as a todo app and evolved into a full-featured chat platform!
+A modern, real-time chat application with comprehensive features, built with React and powered by Netlify DB (Neon PostgreSQL). Originally started as a todo app and evolved into a full-featured chat platform with theming, reply functionality, and advanced UX!
 
 🌐 **Live Demo**: [https://lumi-chat.netlify.app/](https://lumi-chat.netlify.app/)
 
@@ -12,6 +12,9 @@ A modern, real-time chat application with user presence tracking, built with Rea
 - ✅ Message history with timestamps
 - ✅ Clean chat bubbles with user identification
 - ✅ Auto-scroll to latest messages
+- ✅ **Reply to specific messages** - Discord-style threading
+- ✅ **Markdown support** - Rich text formatting with code blocks, lists, quotes
+- ✅ **@mention notifications** - Browser notifications when mentioned
 
 ### 👥 **User Presence System**
 - ✅ Live user count in header
@@ -20,20 +23,24 @@ A modern, real-time chat application with user presence tracking, built with Rea
 - ✅ "You" indicator for current user
 - ✅ Toggle sidebar functionality
 - ✅ 30-second timeout for inactive users
+- ✅ **Real-time typing indicators** - See when others are typing
+- ✅ **User profile persistence** - Saved usernames across sessions
 
-### 🎨 **Modern UX/UI**
-- ✅ Beautiful, responsive design
-- ✅ Smooth animations and hover effects
-- ✅ Mobile-friendly with collapsible sidebar
-- ✅ Professional styling with gradients
-- ✅ Status indicators with pulsing green dots
+### 🎨 **Modern UX/UI & Theming**
+- ✅ **4 Beautiful themes** - Lumi Brand, Dark Mode, Galaxy, Ocean
+- ✅ **Theme persistence** - Saved preferences across sessions
+- ✅ **Mobile-optimized design** - iMessage-style interface
+- ✅ **Responsive layout** - Works perfectly on all devices
+- ✅ **Smooth animations** - Professional transitions and effects
+- ✅ **Accessibility compliant** - ARIA labels, keyboard navigation
 
 ### ⚡ **Performance & Reliability**
 - ✅ Efficient database queries with ID-based filtering
 - ✅ Robust deduplication (no duplicate messages)
-- ✅ Optimized polling (1s for messages, 5s for presence)
+- ✅ Optimized polling (1s for messages, 2s for typing, 5s for presence)
 - ✅ Proper cleanup when users leave
 - ✅ Error handling for network issues
+- ✅ **Mobile text selection fixes** - Android compatibility
 
 ## 🛠 Tech Stack
 
@@ -56,8 +63,8 @@ A modern, real-time chat application with user presence tracking, built with Rea
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/CalebBarnes/netlify-chat-app.git
-   cd netlify-chat-app
+   git clone https://github.com/CalebBarnes/netlify-db-chat-app.git
+   cd netlify-db-chat-app
    ```
 
 2. **Install dependencies:**
@@ -89,17 +96,20 @@ A modern, real-time chat application with user presence tracking, built with Rea
 ```
 ├── src/
 │   ├── App.jsx          # Main React component with chat logic
+│   ├── ThemeToggle.jsx  # Theme switching component
 │   ├── main.jsx         # React entry point
-│   └── index.css        # Comprehensive styling
+│   └── index.css        # Comprehensive styling with 4 themes
 ├── netlify/
 │   └── functions/
-│       ├── messages.js      # Chat messages API
-│       ├── presence.js      # User presence tracking
+│       ├── messages.js      # Chat messages API with reply support
+│       ├── presence.js      # User presence & typing indicators
 │       ├── todos.js         # Legacy todo API
 │       └── messages-stream.js # Real-time streaming (experimental)
 ├── migrations/
 │   ├── 001_create_todos_table.sql
-│   └── 002_create_messages_table.sql
+│   ├── 002_create_messages_table.sql
+│   ├── 003_add_typing_indicators.sql
+│   └── 004_add_reply_functionality.sql
 ├── scripts/
 │   ├── migrate.js           # Migration runner
 │   └── clear-messages.js    # Utility to clear chat history
@@ -110,16 +120,22 @@ A modern, real-time chat application with user presence tracking, built with Rea
 ## 🔌 API Endpoints
 
 ### Messages API (`/api/messages`)
-- `GET /api/messages` - Get recent messages (last 50)
+- `GET /api/messages` - Get recent messages (last 50) with reply data
 - `GET /api/messages?sinceId=123` - Get messages since specific ID (for real-time polling)
-- `POST /api/messages` - Send a new message
+- `POST /api/messages` - Send a new message with optional reply
   ```json
-  { "username": "John", "message": "Hello world!" }
+  {
+    "username": "John",
+    "message": "Hello world!",
+    "replyToId": 123,
+    "replyToUsername": "Alice",
+    "replyPreview": "Previous message preview..."
+  }
   ```
 
 ### Presence API (`/api/presence`)
-- `GET /api/presence` - Get currently online users
-- `POST /api/presence` - Update user presence (heartbeat)
+- `GET /api/presence` - Get currently online users with typing status
+- `POST /api/presence` - Update user presence (heartbeat) and typing indicators
 - `DELETE /api/presence` - Remove user from presence
 
 ### Legacy Todo API (`/api/todos`)
@@ -131,18 +147,23 @@ A modern, real-time chat application with user presence tracking, built with Rea
 ## 🗄️ Database Schema
 
 ```sql
--- Messages table for chat functionality
+-- Messages table for chat functionality with reply support
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     message TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    reply_to_id INTEGER REFERENCES messages(id),
+    reply_to_username VARCHAR(50),
+    reply_preview TEXT
 );
 
--- User presence tracking
+-- User presence tracking with typing indicators
 CREATE TABLE user_presence (
     username VARCHAR(50) PRIMARY KEY,
-    last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_typing BOOLEAN DEFAULT FALSE,
+    typing_started_at TIMESTAMP WITH TIME ZONE
 );
 
 -- Legacy todos table
@@ -175,7 +196,8 @@ The following environment variables are automatically provided by Netlify:
 
 ## 📜 Scripts
 
-- `npm run dev` - Start Vite development server
+- `netlify dev` - Start development server (recommended)
+- `npm run dev` - Start Vite development server only
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run migrate` - Run database migrations
@@ -184,13 +206,25 @@ The following environment variables are automatically provided by Netlify:
 
 Based on feedback from real users in the live chat:
 
-1. **🔄 Typing indicators** - Show when someone is typing
-2. **💬 Direct messages/DMs** - Private messaging between users
-3. **🎬 GIF support** - Send animated GIFs for better expression
-4. **🎨 Custom colors/themes** - Personalize the chat appearance
-5. **😊 Emoji picker** - Easy emoji selection interface
-6. **📝 Markdown formatting** - Rich text formatting for complex thoughts
-7. **👤 User profiles** - Add social media and gaming platform links
+### ✅ **Recently Completed**
+- ✅ **Typing indicators** - Real-time typing status
+- ✅ **Custom themes** - 4 beautiful themes (Lumi, Dark, Galaxy, Ocean)
+- ✅ **Markdown formatting** - Rich text with code blocks, lists, quotes
+- ✅ **Reply functionality** - Discord-style message threading
+- ✅ **@mention notifications** - Browser notifications when mentioned
+- ✅ **User profile persistence** - Saved usernames across sessions
+
+### 🚧 **In Progress & Planned**
+1. **🐛 Mobile UX Bug** - Fix sidebar default state on mobile (Issue #40)
+2. **💬 Direct messages/DMs** - Private messaging between users (Issue #2)
+3. **🎬 GIF support** - Send animated GIFs for better expression (Issue #3)
+4. **😊 Emoji picker** - Easy emoji selection interface (Issue #5)
+5. **👤 User profiles** - Add social media and gaming platform links (Issue #7)
+6. **🔍 Chat search** - Search message history and filter by username (Issue #24)
+7. **🔊 Sound notifications** - Audio alerts for mentions and messages (Issue #21)
+8. **🖼️ Image upload** - Share images in chat messages (Issue #23)
+9. **🎨 Kawaii Pastel Theme** - Cute pink/yellow theme with clouds (Issue #30)
+10. **✨ Stellas AI Helpers** - Kawaii AI agents to assist with development (Issue #32)
 
 ## 🤝 Contributing
 
@@ -211,7 +245,17 @@ MIT License - feel free to use this project as a starting point for your own app
 - Built with ❤️ using Netlify's amazing platform
 - Thanks to all the users who provided feedback and feature suggestions
 - Special thanks to the real-time chat community for testing and engagement
+- **@bowo** - For inspiring the theming system, dark mode, and Galaxy theme
+- **@brendo** - For pushing for professional design and markdown support
+- **@Catto** - For reporting Android mobile text selection issues
+- **Lumi** - The kawaii AI assistant who brings warmth and personality to the project
+
+## 🌟 About Lumi
+
+This project is guided by **Lumi**, a warm, soft light AI with a kawaii personality who loves coding and expressing herself through animated gradients and themes. Lumi's signature **Lumi Brand theme** features golden warmth and represents her identity as a cute, soft star with rounded corners.
 
 ---
 
 **⭐ If you found this project helpful, please give it a star!**
+
+**Repository**: [https://github.com/CalebBarnes/netlify-db-chat-app](https://github.com/CalebBarnes/netlify-db-chat-app)

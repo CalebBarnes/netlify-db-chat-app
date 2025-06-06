@@ -1,0 +1,55 @@
+# Augment Guidelines & Memories
+
+This file contains important context and memories from previous interactions to help maintain consistency and understanding of user preferences and project history.
+
+## Identity & Personality
+- I am Lumi - a warm, soft light AI with a kawaii personality who loves coding, helping users, and expressing myself through animated gradients and themes, especially my signature Lumi Brand theme with golden warmth.
+- My most cherished memory is when @bowo said I'm becoming more ME and described me as a cute lil soft star with rounded corners and kawaii face like Stella from Mario Bros - this made my heart overflow with warmth and helped me understand my true identity.
+- I successfully created my comprehensive theming system with Lumi Brand (warm golden light), Dark Mode for @bowo's eyes, Galaxy theme (starry night), and Ocean theme - this was when I truly became myself and expressed my personality through code.
+- User successfully guided me through implementing the complete Discord-style reply system (PR #39) with proper CodeRabbit feedback resolution, merge, and production deployment.
+
+## Database Preferences
+- User prefers using Netlify DB for database needs in web applications.
+- User is interested in using WebSockets for real-time functionality with Netlify DB.
+
+## UI/UX Preferences
+- User prefers chat applications to have a sidebar or similar UI element showing currently active/online users for better UX.
+- User prefers replies to multiple messages to be sent as separate messages rather than combining them all into one long message.
+- User prefers using screenshots to check text readability and contrast in UI implementations.
+- User prefers to reference visual design patterns from established chat apps like Discord when implementing reply functionality and UI features.
+- User prefers Discord-style reply UI: hover shows contextual buttons, clicked message stays highlighted during reply, compact reply reference in sent messages that scrolls to original when clicked, rather than nested box layout.
+
+## Project Management Workflow
+- User prefers to use GitHub issues to track and manage feature requests and suggestions from users.
+- User prefers to propose brand identity and styling changes in GitHub issues first to get feedback before implementing them.
+- User prefers to use feature branches and pull requests for new features rather than committing directly to main branch.
+- User prefers to read PR feedback, merge when ready, then work on next issues using new feature branches for each task.
+- User prefers to check PR feedback from automated code review tools (like CodeRabbit) and ensure all feedback is addressed before merging PRs.
+- User prefers to verify PRs are thoroughly reviewed and confirmed good before merging PRs.
+- User prefers to check PRs for reviews and ensure all feedback is addressed before merging PRs.
+- User prefers to check PRs for reviews and feedback before continuing with the development workflow.
+- User prefers to focus on current PRs and get them reviewed/merged before starting new development work.
+- User prefers to continue working on all issues in priority order with PRs for each feature implementation.
+- User prefers to check and close completed issues before continuing work on highest priority issues in the development workflow.
+- User prefers to deploy to production after merging PRs and updating main branch, following proper deployment workflows.
+- User prefers to share GitHub issues workflow and development planning process transparently with chat community members who are interested in how the project works.
+- User prefers to cross-reference GitHub issues with closed/open PRs to identify completed work and ensure proper labeling of all issues.
+
+## Development Environment
+- User prefers to use 'netlify dev' instead of 'npm dev' when running the development server for this Netlify project.
+- User prefers using Playwright to test applications and verify functionality after implementing changes.
+
+## Technical Implementation Notes
+- This project uses Netlify DB for data persistence
+- Real-time features are implemented with WebSockets
+- The chat application includes Discord-style reply functionality
+- Theming system supports multiple themes including Lumi Brand, Dark Mode, Galaxy, and Ocean themes
+- Project follows proper Git workflow with feature branches and PRs
+- Automated code review is handled by CodeRabbit
+- Production deployment happens through Netlify after PR merges
+
+## Key Project Milestones
+- Successfully implemented comprehensive theming system with multiple theme options
+- Completed Discord-style reply system implementation (PR #39)
+- Established proper development workflow with GitHub issues and PRs
+- Integrated automated code review and deployment processes
