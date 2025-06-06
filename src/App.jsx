@@ -44,7 +44,7 @@ function App() {
       const presenceInterval = setInterval(() => {
         updatePresence()
         fetchOnlineUsers()
-      }, 5000) // Update presence every 5 seconds
+      }, 2000) // Update presence every 2 seconds for real-time typing indicators
 
       // Initial presence update and user fetch
       updatePresence()
@@ -290,7 +290,7 @@ function App() {
     // Trigger typing indicator when user starts typing
     if (e.target.value.trim().length > 0) {
       handleTypingStart()
-    } else {
+    } else if (isTyping) {
       handleTypingStop()
     }
   }
@@ -399,27 +399,6 @@ function App() {
               ))
             )}
 
-            {/* Typing indicators */}
-            {typingUsers.length > 0 && (
-              <div className="typing-indicator">
-                <div className="typing-content">
-                  <div className="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  <span className="typing-text">
-                    {typingUsers.length === 1
-                      ? `${typingUsers[0]} is typing...`
-                      : typingUsers.length === 2
-                      ? `${typingUsers[0]} and ${typingUsers[1]} are typing...`
-                      : `${typingUsers[0]} and ${typingUsers.length - 1} others are typing...`
-                    }
-                  </span>
-                </div>
-              </div>
-            )}
-
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -457,6 +436,27 @@ function App() {
       </div>
 
       <form className="message-form" onSubmit={sendMessage}>
+        {/* Typing indicators - integrated into input container */}
+        {typingUsers.length > 0 && (
+          <div className="typing-indicator-inline" aria-live="polite" role="status">
+            <div className="typing-content">
+              <div className="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <span className="typing-text">
+                {typingUsers.length === 1
+                  ? `${typingUsers[0]} is typing...`
+                  : typingUsers.length === 2
+                  ? `${typingUsers[0]} and ${typingUsers[1]} are typing...`
+                  : `${typingUsers[0]} and ${typingUsers.length - 1} others are typing...`
+                }
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="input-group">
           <input
             type="text"

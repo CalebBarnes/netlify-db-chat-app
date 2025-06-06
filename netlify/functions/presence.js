@@ -23,7 +23,7 @@ export const handler = async (event) => {
     const { httpMethod, body } = event;
 
     switch (httpMethod) {
-      case "GET":
+      case "GET": {
         // Get all active users (last seen within 30 seconds) with typing status
         const activeUsers = await sql`
           SELECT
@@ -41,8 +41,9 @@ export const handler = async (event) => {
           headers,
           body: JSON.stringify(activeUsers),
         };
+      }
 
-      case "POST":
+      case "POST": {
         // Update user presence (heartbeat) and typing status
         const { username, isTyping } = JSON.parse(body);
 
@@ -103,8 +104,9 @@ export const handler = async (event) => {
           headers,
           body: JSON.stringify({ success: true }),
         };
+      }
 
-      case "DELETE":
+      case "DELETE": {
         // Remove user from presence (when they leave)
         const { username: usernameToRemove } = JSON.parse(body);
 
@@ -126,6 +128,7 @@ export const handler = async (event) => {
           headers,
           body: JSON.stringify({ success: true }),
         };
+      }
 
       default:
         return {
