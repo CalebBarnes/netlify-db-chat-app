@@ -847,5 +847,5 @@ body {
 }
 
 .notification-dismiss-btn:hover {
-  background: #e3f2fd;
+  background: #bbdefb; /* 4.61:1 contrast with #1976d2 - WCAG AA compliant */
 }

@@ -41,7 +41,7 @@ const showMentionNotification = (sender, message) => {
       body: message.length > 100 ? message.substring(0, 100) + '...' : message,
       icon: '/favicon.ico',
       tag: 'chat-mention',
-      requireInteraction: true
+      requireInteraction: false // Less intrusive - auto-closes after 5 seconds
     })
 
     // Auto-close notification after 5 seconds
@@ -150,6 +150,17 @@ function App() {
   // Request notification permission when user joins chat
   useEffect(() => {
     if (isUsernameSet) {
+      // Check if user previously dismissed the notification banner
+      try {
+        const dismissed = localStorage.getItem('chatapp-notification-dismissed')
+        if (dismissed === 'true') {
+          setNotificationPermission('dismissed')
+          return
+        }
+      } catch (error) {
+        console.warn('Failed to load notification preference:', error)
+      }
+
       // Check current permission status
       if ('Notification' in window) {
         setNotificationPermission(Notification.permission)
@@ -592,7 +603,14 @@ function App() {
             </button>
             <button
               className="notification-dismiss-btn"
-              onClick={() => setNotificationPermission('dismissed')}
+              onClick={() => {
+                setNotificationPermission('dismissed')
+                try {
+                  localStorage.setItem('chatapp-notification-dismissed', 'true')
+                } catch (error) {
+                  console.warn('Failed to save notification preference:', error)
+                }
+              }}
             >
               Dismiss
             </button>
