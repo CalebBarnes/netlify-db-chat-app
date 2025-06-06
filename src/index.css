@@ -37,6 +37,13 @@
   --accent-mention: #FFC107;
   --accent-online: #4CAF50;
   --accent-typing: #FF9800;
+
+  /* Theme contrast variables for better readability */
+  --heading-color: #3E2723;
+  --panel-background: #FFFFFF;
+  --panel-text: #333333;
+  --panel-border: #e1e5e9;
+  --username-color: #333333;
 }
 
 /* Galaxy theme specific text contrast improvements */
@@ -97,6 +104,13 @@
   --accent-mention: #fbb6ce;
   --accent-online: #68d391;
   --accent-typing: #fbb6ce;
+
+  /* Dark theme contrast variables for better readability */
+  --heading-color: #ffffff;
+  --panel-background: #2d3748;
+  --panel-text: #ffffff;
+  --panel-border: #4a5568;
+  --username-color: #ffffff;
 }
 
 /* 🎨 CUSTOM THEME SYSTEM - For personalization */
@@ -129,6 +143,13 @@
   --accent-mention: #0284c7;
   --accent-online: #10b981;
   --accent-typing: #0ea5e9;
+
+  /* Ocean theme contrast variables for better readability */
+  --heading-color: #0c4a6e;
+  --panel-background: rgba(240, 249, 255, 0.95);
+  --panel-text: #0c4a6e;
+  --panel-border: rgba(14, 165, 233, 0.3);
+  --username-color: #0c4a6e;
 }
 
 /* 🌌 GALAXY THEME - @bowo's starry galaxy idea! */
@@ -161,6 +182,13 @@
   --accent-mention: #fbbf24;
   --accent-online: #34d399;
   --accent-typing: #a78bfa;
+
+  /* Galaxy theme contrast variables for better readability */
+  --heading-color: #fbbf24; /* Golden star color for headings */
+  --panel-background: rgba(26, 26, 46, 0.95);
+  --panel-text: #ffffff;
+  --panel-border: rgba(167, 139, 250, 0.3);
+  --username-color: #ffffff;
 }
 
 body {
@@ -510,17 +538,19 @@ body {
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #e1e5e9;
-  background: white;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .sidebar-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #333;
+  color: var(--panel-text);
+  transition: color 0.3s ease;
 }
 
 .sidebar-header-actions {
@@ -534,31 +564,36 @@ body {
   background: none;
   border: none;
   font-size: 18px;
-  color: #666;
+  color: var(--panel-text);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.3s ease;
+  opacity: 0.7;
 }
 
 .sidebar-close-btn:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  opacity: 1;
 }
 
 .user-count-badge {
-  background: #667eea;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .online-users-list {
   flex: 1;
   padding: 10px 0;
   overflow-y: auto;
+  background: var(--panel-background);
+  transition: background 0.3s ease;
 }
 
 .online-user {
@@ -570,11 +605,11 @@ body {
 }
 
 .online-user:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: var(--border-primary);
 }
 
 .online-user.current-user {
-  background: rgba(102, 126, 234, 0.15);
+  background: var(--border-secondary);
 }
 
 .user-status {
@@ -593,19 +628,22 @@ body {
 
 .username {
   font-weight: 500;
-  color: #333;
+  color: var(--username-color);
+  transition: color 0.3s ease;
 }
 
 .you-label {
   font-size: 12px;
-  color: #667eea;
+  color: var(--accent-primary);
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .no-users {
   padding: 40px 20px;
   text-align: center;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
 }
 
 .no-users p {
