@@ -121,7 +121,14 @@ function App() {
   const [lastMessageTime, setLastMessageTime] = useState(null)
   const [lastMessageId, setLastMessageId] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState([])
-  const [showSidebar, setShowSidebar] = useState(true)
+  // Initialize sidebar state based on screen size - closed on mobile, open on desktop
+  const [showSidebar, setShowSidebar] = useState(() => {
+    // Check if we're on mobile (screen width < 768px)
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768
+    }
+    return false // Default to closed if window is not available (SSR)
+  })
   const [typingUsers, setTypingUsers] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
@@ -243,6 +250,27 @@ function App() {
     document.addEventListener('keydown', handleEscapeKey)
     return () => {
       document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [showSidebar])
+
+  // Handle window resize for responsive sidebar behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768
+
+      // If switching to mobile view and sidebar is open, close it
+      if (isMobile && showSidebar) {
+        setShowSidebar(false)
+      }
+      // If switching to desktop view and sidebar is closed, open it
+      else if (!isMobile && !showSidebar) {
+        setShowSidebar(true)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
     }
   }, [showSidebar])
 
