@@ -90,9 +90,23 @@ async function runMigrations() {
       WHERE is_typing = TRUE
     `;
 
+    // Migration 004: Add reply functionality to messages table
+    console.log("Adding reply functionality to messages table...");
+    await sql`
+      ALTER TABLE messages
+      ADD COLUMN IF NOT EXISTS reply_to_id INTEGER REFERENCES messages(id),
+      ADD COLUMN IF NOT EXISTS reply_to_username VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS reply_preview TEXT
+    `;
+
+    console.log("Creating reply functionality index...");
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages(reply_to_id)
+    `;
+
     console.log("✅ Migration completed successfully!");
     console.log(
-      "🎉 Your chat app with user presence is ready to use with typing indicators!"
+      "🎉 Your chat app with user presence, typing indicators, and reply functionality is ready to use!"
     );
   } catch (error) {
     console.error("❌ Migration failed:", error);
