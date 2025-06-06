@@ -1,4 +1,41 @@
 import { useState, useEffect, useRef } from 'react'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true, // Convert line breaks to <br>
+  gfm: true, // Enable GitHub Flavored Markdown
+  sanitize: false, // We'll handle sanitization manually
+  smartLists: true,
+  smartypants: false
+})
+
+// Secure markdown renderer with DOMPurify sanitization
+const renderMarkdown = (text) => {
+  if (!text) return ''
+
+  try {
+    // First convert markdown to HTML
+    const html = marked(text)
+
+    // Then sanitize the HTML with DOMPurify for comprehensive XSS protection
+    return DOMPurify.sanitize(html, {
+      // Allow common HTML elements for markdown
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'code', 'pre', 'blockquote',
+        'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+      ],
+      ALLOWED_ATTR: ['href', 'title'],
+      // Ensure links are safe
+      ALLOW_DATA_ATTR: false,
+      ALLOW_UNKNOWN_PROTOCOLS: false
+    })
+  } catch (error) {
+    console.warn('Markdown parsing error:', error)
+    return DOMPurify.sanitize(text) // Fallback to sanitized plain text
+  }
+}
 
 function App() {
   const [messages, setMessages] = useState([])
@@ -456,9 +493,10 @@ function App() {
                     <span className="message-username">{message.username}</span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
                   </div>
-                  <div className="message-content">
-                    {message.message}
-                  </div>
+                  <div
+                    className="message-content"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message) }}
+                  />
                 </div>
               ))
             )}
