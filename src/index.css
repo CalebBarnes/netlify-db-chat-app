@@ -1619,3 +1619,134 @@ body {
 .notification-dismiss-btn:hover {
   background: #bbdefb; /* 4.61:1 contrast with #1976d2 - WCAG AA compliant */
 }
+
+/* Sound Settings Panel */
+.sound-settings-panel {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 12px 20px;
+  margin: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.sound-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.sound-settings-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.sound-toggle input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.volume-control input[type="range"] {
+  width: 80px;
+  height: 4px;
+  background: var(--border-primary);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.sound-options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sound-options label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sound-options input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.sound-test-btn {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.sound-test-btn:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.sound-test-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive sound settings */
+@media (max-width: 768px) {
+  .sound-settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .sound-settings-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .sound-options {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
