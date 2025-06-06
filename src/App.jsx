@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -10,21 +11,29 @@ marked.setOptions({
   smartypants: false
 })
 
-// Simple markdown renderer with basic safety
+// Secure markdown renderer with DOMPurify sanitization
 const renderMarkdown = (text) => {
   if (!text) return ''
 
-  // Basic sanitization - remove script tags and dangerous attributes
-  const sanitized = text
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/on\w+="[^"]*"/gi, '')
-    .replace(/javascript:/gi, '')
-
   try {
-    return marked(sanitized)
+    // First convert markdown to HTML
+    const html = marked(text)
+
+    // Then sanitize the HTML with DOMPurify for comprehensive XSS protection
+    return DOMPurify.sanitize(html, {
+      // Allow common HTML elements for markdown
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'code', 'pre', 'blockquote',
+        'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+      ],
+      ALLOWED_ATTR: ['href', 'title'],
+      // Ensure links are safe
+      ALLOW_DATA_ATTR: false,
+      ALLOW_UNKNOWN_PROTOCOLS: false
+    })
   } catch (error) {
     console.warn('Markdown parsing error:', error)
-    return text // Fallback to plain text
+    return DOMPurify.sanitize(text) // Fallback to sanitized plain text
   }
 }
 
