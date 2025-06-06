@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState('lumi') // Default to Lumi theme
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
 
   // Load saved theme from localStorage on component mount
   useEffect(() => {
@@ -19,16 +21,32 @@ const ThemeToggle = () => {
     }
   }, [])
 
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isDropdownOpen])
+
   // Handle theme change
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme)
     document.documentElement.setAttribute('data-theme', newTheme)
-    
+
     try {
       localStorage.setItem('chatapp-theme', newTheme)
     } catch (error) {
       console.warn('Failed to save theme preference:', error)
     }
+
+    setIsDropdownOpen(false)
   }
 
   const themes = [
@@ -59,32 +77,38 @@ const ThemeToggle = () => {
   ]
 
   return (
-    <div className="theme-toggle">
-      <button 
+    <div className="theme-toggle" ref={dropdownRef}>
+      <button
         className="theme-toggle-btn"
-        onClick={() => {
-          const dropdown = document.querySelector('.theme-dropdown')
-          dropdown.classList.toggle('show')
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setIsDropdownOpen(false)
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsDropdownOpen(!isDropdownOpen)
+          }
         }}
         title="Change theme"
+        aria-expanded={isDropdownOpen}
+        aria-haspopup="menu"
+        aria-label="Choose theme"
       >
         {themes.find(t => t.id === theme)?.name || '🌟 Lumi'}
       </button>
-      
-      <div className="theme-dropdown">
+
+      <div className={`theme-dropdown ${isDropdownOpen ? 'show' : ''}`}>
         <div className="theme-dropdown-header">
           <h4>🎨 Choose Theme</h4>
           <p>Addresses Issues #4, #22, #27</p>
         </div>
-        
+
         {themes.map((themeOption) => (
           <button
             key={themeOption.id}
             className={`theme-option ${theme === themeOption.id ? 'active' : ''}`}
-            onClick={() => {
-              handleThemeChange(themeOption.id)
-              document.querySelector('.theme-dropdown').classList.remove('show')
-            }}
+            onClick={() => handleThemeChange(themeOption.id)}
+            role="menuitem"
+            aria-label={`Switch to ${themeOption.name} theme`}
           >
             <div className="theme-info">
               <div className="theme-name">{themeOption.name}</div>
@@ -92,7 +116,7 @@ const ThemeToggle = () => {
             </div>
             <div className="theme-preview">
               {themeOption.colors.map((color, index) => (
-                <div 
+                <div
                   key={index}
                   className="theme-color-dot"
                   style={{ backgroundColor: color }}
@@ -101,7 +125,7 @@ const ThemeToggle = () => {
             </div>
           </button>
         ))}
-        
+
         <div className="theme-dropdown-footer">
           <small>✨ More themes coming soon!</small>
         </div>

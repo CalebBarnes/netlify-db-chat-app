@@ -191,6 +191,7 @@ body {
   flex-direction: column;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
 }
 
 .header {
@@ -840,7 +841,9 @@ body {
   transform: translateY(-10px) scale(0.95);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 12px;
+  background: rgba(255, 248, 225, 0.95); /* Fallback for older browsers */
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
 }
 
 .theme-dropdown.show {
@@ -947,157 +950,7 @@ body {
 
 /* Duplicate theme toggle styles removed - using the first definition above */
 
-/* Duplicate theme dropdown styles removed - using the first definition above */
-
-.theme-option {
-  width: 100%;
-  padding: 16px 20px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s ease;
-  text-align: left;
-  border-radius: 0;
-}
-
-.theme-option:hover {
-  background: var(--bg-tertiary);
-  transform: translateX(4px);
-}
-
-/* Duplicate removed - using the first definition above */
-
-.theme-info {
-  flex: 1;
-}
-
-.theme-name {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-  font-size: 16px;
-}
-
-.theme-description {
-  font-size: 13px;
-  color: var(--text-tertiary);
-  font-style: italic;
-}
-
-.theme-preview {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-/* Duplicate removed - using the first definition above */
-
-.theme-option:hover .theme-color-dot {
-  transform: scale(1.2);
-}
-
-.theme-dropdown-footer {
-  padding: 16px 20px;
-  border-top: 1px solid var(--border-primary);
-  text-align: center;
-  background: var(--bg-tertiary);
-  border-radius: 0 0 16px 16px;
-}
-
-.theme-dropdown-footer small {
-  color: var(--text-tertiary);
-  font-style: italic;
-  font-size: 12px;
-}
-
-/* Second duplicate theme toggle styles removed - using the first definition above */
-
-.theme-toggle-btn {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: var(--text-primary);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.theme-toggle-btn:hover {
-  background: var(--accent-secondary);
-  border-color: var(--border-focus);
-  transform: translateY(-1px);
-}
-
-/* Third duplicate theme dropdown styles removed - using the first definition above */
-
-.theme-option {
-  width: 100%;
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background 0.2s ease;
-  text-align: left;
-}
-
-.theme-option:hover {
-  background: var(--bg-tertiary);
-}
-
-.theme-option.active {
-  background: var(--accent-secondary);
-  color: var(--text-primary);
-}
-
-.theme-info {
-  flex: 1;
-}
-
-.theme-name {
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.theme-description {
-  font-size: 12px;
-  color: var(--text-tertiary);
-}
-
-.theme-preview {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.theme-color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid var(--border-secondary);
-}
-
-.theme-dropdown-footer {
-  padding: 12px 16px;
-  border-top: 1px solid var(--border-primary);
-  text-align: center;
-}
-
-.theme-dropdown-footer small {
-  color: var(--text-tertiary);
-  font-style: italic;
-}
+/* Duplicate CSS rules removed - keeping only the first complete definition above */
 
 @media (max-width: 768px) {
   /* Body styling is already consistent - no mobile overrides needed */
