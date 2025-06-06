@@ -1,4 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
+import { marked } from 'marked'
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true, // Convert line breaks to <br>
+  gfm: true, // Enable GitHub Flavored Markdown
+  sanitize: false, // We'll handle sanitization manually
+  smartLists: true,
+  smartypants: false
+})
+
+// Simple markdown renderer with basic safety
+const renderMarkdown = (text) => {
+  if (!text) return ''
+
+  // Basic sanitization - remove script tags and dangerous attributes
+  const sanitized = text
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '')
+    .replace(/javascript:/gi, '')
+
+  try {
+    return marked(sanitized)
+  } catch (error) {
+    console.warn('Markdown parsing error:', error)
+    return text // Fallback to plain text
+  }
+}
 
 function App() {
   const [messages, setMessages] = useState([])
@@ -456,9 +484,10 @@ function App() {
                     <span className="message-username">{message.username}</span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
                   </div>
-                  <div className="message-content">
-                    {message.message}
-                  </div>
+                  <div
+                    className="message-content"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message) }}
+                  />
                 </div>
               ))
             )}
