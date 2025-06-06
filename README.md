@@ -2,7 +2,7 @@
 
 A modern, real-time chat application with user presence tracking, built with React and powered by Netlify DB (Neon PostgreSQL). Originally started as a todo app and evolved into a full-featured chat platform!
 
-🌐 **Live Demo**: [https://todo-app-netlify-db.netlify.app](https://todo-app-netlify-db.netlify.app)
+🌐 **Live Demo**: [https://lumi-chat.netlify.app/](https://lumi-chat.netlify.app/)
 
 ## ✨ Features
 
