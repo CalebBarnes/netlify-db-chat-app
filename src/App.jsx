@@ -125,7 +125,11 @@ function App() {
   const [typingUsers, setTypingUsers] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
+
+  // Reply functionality state
+  const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
   const messagesEndRef = useRef(null)
+  const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
   const typingTimeoutRef = useRef(null)
@@ -444,7 +448,10 @@ function App() {
         },
         body: JSON.stringify({
           username: username.trim(),
-          message: newMessage.trim()
+          message: newMessage.trim(),
+          replyToId: replyingTo?.id || null,
+          replyToUsername: replyingTo?.username || null,
+          replyPreview: replyingTo?.message || null
         }),
       })
 
@@ -459,6 +466,12 @@ function App() {
       lastMessageTimeRef.current = message.created_at
       lastMessageIdRef.current = message.id
       setNewMessage('')
+
+      // Remove highlighting from any message being replied to
+      document.querySelectorAll('.message.being-replied-to').forEach(el => {
+        el.classList.remove('being-replied-to')
+      })
+      setReplyingTo(null) // Clear reply state after sending
     } catch (err) {
       console.error('Error sending message:', err)
       setError('Failed to send message. Please try again.')
@@ -499,6 +512,55 @@ function App() {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // Reply functionality handlers
+  const handleReply = (message) => {
+    setReplyingTo({
+      id: message.id,
+      username: message.username,
+      message: message.message.substring(0, 100) // Preview first 100 chars
+    })
+
+    // Highlight the message being replied to
+    const messageElement = document.querySelector(`[data-message-id="${message.id}"]`)
+    if (messageElement) {
+      // Remove any existing highlights first
+      document.querySelectorAll('.message.being-replied-to').forEach(el => {
+        el.classList.remove('being-replied-to')
+      })
+
+      // Add highlight to the message being replied to
+      messageElement.classList.add('being-replied-to')
+    }
+
+    // Focus the input field
+    messageInputRef.current?.focus()
+  }
+
+  const cancelReply = () => {
+    // Remove highlighting from any message being replied to
+    document.querySelectorAll('.message.being-replied-to').forEach(el => {
+      el.classList.remove('being-replied-to')
+    })
+    setReplyingTo(null)
+  }
+
+  // Scroll to original message when reply reference is clicked
+  const scrollToMessage = (messageId) => {
+    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`)
+    if (messageElement) {
+      messageElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+
+      // Temporarily highlight the message
+      messageElement.classList.add('being-replied-to')
+      setTimeout(() => {
+        messageElement.classList.remove('being-replied-to')
+      }, 2000)
+    }
   }
 
   if (loading) {
@@ -632,11 +694,35 @@ function App() {
               messages.map(message => (
                 <div
                   key={message.id}
+                  data-message-id={message.id}
                   className={`message ${message.username === username ? 'own-message' : ''}`}
                 >
+                  {/* Show compact reply reference if this is a reply - Discord style */}
+                  {message.reply_to_id && (
+                    <div
+                      className="reply-reference"
+                      onClick={() => scrollToMessage(message.reply_to_id)}
+                      title="Click to jump to original message"
+                    >
+                      <span className="reply-icon">↳</span>
+                      <span className="reply-to">
+                        <strong>@{message.reply_to_username}</strong>
+                        <span className="reply-preview">{message.reply_preview}</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div className="message-header">
                     <span className="message-username">{message.username}</span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
+                    <button
+                      className="reply-btn"
+                      onClick={() => handleReply(message)}
+                      title={`Reply to ${message.username}`}
+                      aria-label={`Reply to ${message.username}'s message`}
+                    >
+                      ↩️
+                    </button>
                   </div>
                   <div
                     className="message-content"
@@ -700,6 +786,27 @@ function App() {
       </div>
 
       <form className="message-form" onSubmit={sendMessage}>
+        {/* Reply preview */}
+        {replyingTo && (
+          <div className="reply-preview">
+            <div className="reply-preview-content">
+              <span className="reply-preview-label">
+                Replying to <strong>@{replyingTo.username}</strong>:
+              </span>
+              <span className="reply-preview-text">{replyingTo.message}</span>
+            </div>
+            <button
+              type="button"
+              className="reply-cancel-btn"
+              onClick={cancelReply}
+              aria-label="Cancel reply"
+              title="Cancel reply"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Typing indicators - dedicated space with no layout shift */}
         <div
           className={`typing-indicator-dedicated ${typingUsers.length > 0 ? 'visible' : 'hidden'}`}
@@ -727,6 +834,7 @@ function App() {
 
         <div className="input-group">
           <input
+            ref={messageInputRef}
             type="text"
             className="message-input"
             placeholder="Type your message..."

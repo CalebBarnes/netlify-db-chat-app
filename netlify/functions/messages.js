@@ -33,7 +33,7 @@ export const handler = async (event) => {
         if (sinceId) {
           // Get messages with ID greater than sinceId (most reliable for real-time polling)
           messages = await sql`
-            SELECT id, username, message, created_at
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
             FROM messages
             WHERE id > ${parseInt(sinceId)}
             ORDER BY created_at ASC, id ASC
@@ -41,7 +41,7 @@ export const handler = async (event) => {
         } else if (since) {
           // Fallback to timestamp-based filtering
           messages = await sql`
-            SELECT id, username, message, created_at
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
             FROM messages
             WHERE created_at > ${since}
             ORDER BY created_at ASC, id ASC
@@ -49,8 +49,8 @@ export const handler = async (event) => {
         } else {
           // Get recent messages (last 50)
           messages = await sql`
-            SELECT id, username, message, created_at 
-            FROM messages 
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
+            FROM messages
             ORDER BY created_at DESC
             LIMIT 50
           `;
@@ -64,9 +64,10 @@ export const handler = async (event) => {
           body: JSON.stringify(messages),
         };
 
-      case "POST":
+      case "POST": {
         // Send a new message
-        const { username, message } = JSON.parse(body);
+        const { username, message, replyToId, replyToUsername, replyPreview } =
+          JSON.parse(body);
 
         if (!username || !username.trim()) {
           return {
@@ -106,10 +107,38 @@ export const handler = async (event) => {
           };
         }
 
+        // Validate reply data if provided
+        if (replyToId) {
+          // Ensure replyToId is a valid integer
+          const replyId = parseInt(replyToId);
+          if (isNaN(replyId) || replyId <= 0) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({
+                error: "Reply ID must be a valid positive integer",
+              }),
+            };
+          }
+
+          // Ensure reply metadata is provided
+          if (!replyToUsername || !replyPreview) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({
+                error: "Reply requires both username and preview",
+              }),
+            };
+          }
+        }
+
         const [newMessage] = await sql`
-          INSERT INTO messages (username, message, created_at)
-          VALUES (${username.trim()}, ${message.trim()}, NOW())
-          RETURNING id, username, message, created_at
+          INSERT INTO messages (username, message, created_at, reply_to_id, reply_to_username, reply_preview)
+          VALUES (${username.trim()}, ${message.trim()}, NOW(), ${
+          replyToId || null
+        }, ${replyToUsername || null}, ${replyPreview || null})
+          RETURNING id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
         `;
 
         return {
@@ -117,6 +146,7 @@ export const handler = async (event) => {
           headers,
           body: JSON.stringify(newMessage),
         };
+      }
 
       default:
         return {
