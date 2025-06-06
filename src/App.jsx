@@ -11,22 +11,86 @@ marked.setOptions({
   smartypants: false
 })
 
-// Secure markdown renderer with DOMPurify sanitization
-const renderMarkdown = (text) => {
+// Detect @mentions in message text
+const detectMentions = (message) => {
+  const mentionRegex = /@([a-zA-Z0-9_-]+)/g
+  const matches = message.match(mentionRegex) || []
+  return matches.map(match => match.substring(1)) // Remove @ symbol
+}
+
+// Check if current user is mentioned
+const isUserMentioned = (mentions, currentUser) => {
+  return mentions.some(mention =>
+    mention.toLowerCase() === currentUser.toLowerCase()
+  )
+}
+
+// Request notification permission
+const requestNotificationPermission = async () => {
+  if ('Notification' in window) {
+    const permission = await Notification.requestPermission()
+    return permission === 'granted'
+  }
+  return false
+}
+
+// Show notification for mention
+const showMentionNotification = (sender, message) => {
+  if (Notification.permission === 'granted') {
+    const notification = new Notification(`${sender} mentioned you`, {
+      body: message.length > 100 ? message.substring(0, 100) + '...' : message,
+      icon: '/favicon.ico',
+      tag: 'chat-mention',
+      requireInteraction: true
+    })
+
+    // Auto-close notification after 5 seconds
+    setTimeout(() => {
+      notification.close()
+    }, 5000)
+
+    // Focus window when notification is clicked
+    notification.onclick = () => {
+      window.focus()
+      notification.close()
+    }
+  }
+}
+
+// Secure markdown renderer with DOMPurify sanitization and mention highlighting
+const renderMarkdown = (text, currentUser = '') => {
   if (!text) return ''
 
   try {
-    // First convert markdown to HTML
-    const html = marked(text)
+    // First highlight @mentions before markdown processing
+    let processedText = text
+    if (currentUser) {
+      // Highlight mentions of the current user
+      const mentionRegex = new RegExp(`@(${currentUser})\\b`, 'gi')
+      processedText = processedText.replace(mentionRegex, '<mark class="mention-highlight">@$1</mark>')
+
+      // Highlight other mentions with a different style
+      const otherMentionRegex = /@([a-zA-Z0-9_-]+)/g
+      processedText = processedText.replace(otherMentionRegex, (match, username) => {
+        if (username.toLowerCase() === currentUser.toLowerCase()) {
+          return match // Already highlighted above
+        }
+        return `<span class="mention">@${username}</span>`
+      })
+    }
+
+    // Then convert markdown to HTML
+    const html = marked(processedText)
 
     // Then sanitize the HTML with DOMPurify for comprehensive XSS protection
     return DOMPurify.sanitize(html, {
-      // Allow common HTML elements for markdown
+      // Allow common HTML elements for markdown + mention highlighting
       ALLOWED_TAGS: [
         'p', 'br', 'strong', 'em', 'code', 'pre', 'blockquote',
-        'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+        'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'mark', 'span'
       ],
-      ALLOWED_ATTR: ['href', 'title'],
+      ALLOWED_ATTR: ['href', 'title', 'class'],
       // Ensure links are safe
       ALLOW_DATA_ATTR: false,
       ALLOW_UNKNOWN_PROTOCOLS: false
@@ -51,6 +115,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(true)
   const [typingUsers, setTypingUsers] = useState([])
   const [isTyping, setIsTyping] = useState(false)
+  const [notificationPermission, setNotificationPermission] = useState('default')
   const messagesEndRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
@@ -73,6 +138,23 @@ function App() {
       console.warn('Failed to load saved username from localStorage:', error)
     }
   }, [])
+
+  // Request notification permission when user joins chat
+  useEffect(() => {
+    if (isUsernameSet) {
+      // Check current permission status
+      if ('Notification' in window) {
+        setNotificationPermission(Notification.permission)
+
+        // Request permission if not already granted or denied
+        if (Notification.permission === 'default') {
+          requestNotificationPermission().then(granted => {
+            setNotificationPermission(granted ? 'granted' : 'denied')
+          })
+        }
+      }
+    }
+  }, [isUsernameSet])
 
   // Fetch initial messages on component mount
   useEffect(() => {
@@ -183,6 +265,17 @@ function App() {
           const trulyNewMessages = newMessages.filter(msg => !existingIds.has(msg.id))
 
           if (trulyNewMessages.length > 0) {
+            // Check for mentions in new messages and show notifications
+            trulyNewMessages.forEach(message => {
+              // Don't notify for own messages
+              if (message.username !== username.trim()) {
+                const mentions = detectMentions(message.message)
+                if (isUserMentioned(mentions, username.trim())) {
+                  showMentionNotification(message.username, message.message)
+                }
+              }
+            })
+
             // Update refs with the latest message info
             const latestMessage = trulyNewMessages[trulyNewMessages.length - 1]
             lastMessageTimeRef.current = latestMessage.created_at
@@ -475,6 +568,30 @@ function App() {
         </div>
       )}
 
+      {/* Notification Permission Banner */}
+      {isUsernameSet && notificationPermission === 'default' && (
+        <div className="notification-banner">
+          <span>🔔 Enable notifications to get alerted when someone mentions you!</span>
+          <div className="notification-banner-actions">
+            <button
+              className="notification-enable-btn"
+              onClick={async () => {
+                const granted = await requestNotificationPermission()
+                setNotificationPermission(granted ? 'granted' : 'denied')
+              }}
+            >
+              Enable
+            </button>
+            <button
+              className="notification-dismiss-btn"
+              onClick={() => setNotificationPermission('dismissed')}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="chat-container">
         <div className="messages-container">
           <div className="messages-list">
@@ -495,7 +612,7 @@ function App() {
                   </div>
                   <div
                     className="message-content"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message) }}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message, username) }}
                   />
                 </div>
               ))

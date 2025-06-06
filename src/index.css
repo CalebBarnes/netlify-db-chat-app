@@ -747,3 +747,105 @@ body {
 .message-content > *:last-child {
   margin-bottom: 0;
 }
+
+/* Mention Highlighting Styles */
+.mention-highlight {
+  background: #fff3cd;
+  color: #856404;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid #ffeaa7;
+  animation: mentionPulse 0.5s ease-out;
+}
+
+.own-message .mention-highlight {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.mention {
+  color: #667eea;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 1px 2px;
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.mention:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.own-message .mention {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.own-message .mention:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes mentionPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+  }
+}
+
+/* Notification Permission Banner */
+.notification-banner {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  color: #1565c0;
+  padding: 12px 20px;
+  margin: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.notification-banner-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.notification-enable-btn {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notification-enable-btn:hover {
+  background: #1565c0;
+}
+
+.notification-dismiss-btn {
+  background: none;
+  border: 1px solid #90caf9;
+  color: #1976d2;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notification-dismiss-btn:hover {
+  background: #e3f2fd;
+}
