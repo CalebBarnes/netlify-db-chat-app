@@ -1092,10 +1092,36 @@ body {
     font-size: 16px; /* Prevent zoom on iOS */
     border-radius: 20px; /* More rounded like iMessage input */
     border: 2px solid #e1e5e9;
+
+    /* Fix Android text selection and cursor positioning issues */
+    -webkit-user-select: text; /* Allow text selection on WebKit browsers */
+    -moz-user-select: text; /* Allow text selection on Firefox */
+    -ms-user-select: text; /* Allow text selection on IE/Edge */
+    user-select: text; /* Standard property for text selection */
+
+    /* Ensure proper touch behavior for text selection */
+    -webkit-touch-callout: default; /* Allow callout on long press */
+    touch-action: manipulation; /* Allow pinch-zoom and pan, but disable double-tap zoom */
+
+    /* Improve text selection on mobile */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+    -webkit-appearance: none; /* Remove default styling */
+    appearance: none; /* Standard property */
+
+    /* Ensure cursor is visible and behaves correctly */
+    caret-color: auto; /* Ensure caret is visible */
+
+    /* Fix for Android Chrome text selection */
+    -webkit-text-size-adjust: 100%; /* Prevent text size adjustment */
+    text-size-adjust: 100%; /* Standard property */
   }
 
   .message-input:focus {
     border-color: #007AFF; /* iOS blue focus color */
+
+    /* Enhanced focus state for better mobile experience */
+    outline: none; /* Remove default outline */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on focus */
   }
 
   .join-btn, .send-btn {
@@ -1132,6 +1158,30 @@ body {
 
   .typing-content {
     font-size: 12px; /* Smaller typing indicator */
+  }
+
+  /* Android-specific fixes for text selection and cursor positioning */
+  .message-input {
+    /* Additional Android Chrome fixes */
+    -webkit-rtl-ordering: logical; /* Ensure proper text direction */
+
+    /* Fix for Android text selection issues */
+    -webkit-user-modify: read-write-plaintext-only; /* Allow text editing */
+
+    /* Ensure proper input behavior on Android */
+    -webkit-writing-mode: horizontal-tb; /* Ensure horizontal text flow */
+    writing-mode: horizontal-tb; /* Standard property */
+
+    /* Fix cursor positioning on Android */
+    text-align: left; /* Ensure left alignment for cursor positioning */
+    direction: ltr; /* Left-to-right text direction */
+
+    /* Prevent Android keyboard from affecting layout */
+    resize: none; /* Prevent resizing */
+    overflow: visible; /* Ensure text is visible */
+
+    /* Fix for Android Chrome input selection */
+    -webkit-text-stroke: 0; /* Remove text stroke that can interfere */
   }
 }
 

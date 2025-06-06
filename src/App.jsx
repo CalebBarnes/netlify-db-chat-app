@@ -734,6 +734,11 @@ function App() {
             onChange={handleMessageInputChange}
             disabled={submitting}
             maxLength={1000}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            inputMode="text"
           />
           <button
             type="submit"
