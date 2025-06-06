@@ -274,6 +274,18 @@ function App() {
     }
   }, [showSidebar])
 
+  // Auto-focus message input when user joins chat
+  useEffect(() => {
+    if (isUsernameSet && messageInputRef.current) {
+      // Small delay to ensure DOM is ready and any animations are complete
+      setTimeout(() => {
+        if (messageInputRef.current) {
+          messageInputRef.current.focus()
+        }
+      }, 100)
+    }
+  }, [isUsernameSet])
+
   const fetchMessages = async () => {
     try {
       setLoading(true)
@@ -500,9 +512,23 @@ function App() {
         el.classList.remove('being-replied-to')
       })
       setReplyingTo(null) // Clear reply state after sending
+
+      // Maintain focus on input field after sending message
+      setTimeout(() => {
+        if (messageInputRef.current) {
+          messageInputRef.current.focus()
+        }
+      }, 0)
     } catch (err) {
       console.error('Error sending message:', err)
       setError('Failed to send message. Please try again.')
+
+      // Maintain focus even on error
+      setTimeout(() => {
+        if (messageInputRef.current) {
+          messageInputRef.current.focus()
+        }
+      }, 0)
     } finally {
       setSubmitting(false)
     }
