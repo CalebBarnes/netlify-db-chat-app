@@ -234,8 +234,10 @@ body {
   overflow: hidden;
 }
 
+
+
 .sidebar-backdrop {
-  display: none; /* Hidden on desktop */
+  display: none; /* Hidden on desktop, shown on mobile */
 }
 
 .sidebar-header {
