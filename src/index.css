@@ -234,6 +234,10 @@ body {
   overflow: hidden;
 }
 
+.sidebar-backdrop {
+  display: none; /* Hidden on desktop */
+}
+
 .sidebar-header {
   padding: 20px;
   border-bottom: 1px solid #e1e5e9;
@@ -246,6 +250,29 @@ body {
 .sidebar-header h3 {
   margin: 0;
   font-size: 1.1rem;
+  color: #333;
+}
+
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-close-btn {
+  display: none; /* Hidden on desktop */
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: #f0f0f0;
   color: #333;
 }
 
@@ -472,13 +499,52 @@ body {
     align-self: flex-end;
   }
 
+  /* Mobile sidebar backdrop */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
   .sidebar {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     height: 100%;
     z-index: 10;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  /* Show close button on mobile */
+  .sidebar-close-btn {
+    display: block;
+  }
+
+  /* Improve touch targets */
+  .sidebar-toggle {
+    padding: 12px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .username-form, .message-form {

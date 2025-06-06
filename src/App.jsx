@@ -76,6 +76,20 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [isUsernameSet, username])
 
+  // Handle escape key to close sidebar
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape' && showSidebar) {
+        setShowSidebar(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeKey)
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [showSidebar])
+
   const fetchMessages = async () => {
     try {
       setLoading(true)
@@ -361,8 +375,10 @@ function App() {
             <button
               className="sidebar-toggle"
               onClick={() => setShowSidebar(!showSidebar)}
+              aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
+              aria-expanded={showSidebar}
             >
-              {showSidebar ? '👥' : '👥'}
+              👥
             </button>
           </div>
         </div>
@@ -404,11 +420,27 @@ function App() {
         </div>
 
         {showSidebar && (
-          <div className="sidebar">
-            <div className="sidebar-header">
-              <h3>👥 Online Users</h3>
-              <span className="user-count-badge">{onlineUsers.length}</span>
-            </div>
+          <>
+            {/* Mobile backdrop overlay */}
+            <div
+              className="sidebar-backdrop"
+              onClick={() => setShowSidebar(false)}
+              aria-hidden="true"
+            />
+            <div className="sidebar">
+              <div className="sidebar-header">
+                <h3>👥 Online Users</h3>
+                <div className="sidebar-header-actions">
+                  <span className="user-count-badge">{onlineUsers.length}</span>
+                  <button
+                    className="sidebar-close-btn"
+                    onClick={() => setShowSidebar(false)}
+                    aria-label="Close online users panel"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
             <div className="online-users-list">
               {onlineUsers.length === 0 ? (
                 <div className="no-users">
@@ -432,6 +464,7 @@ function App() {
               )}
             </div>
           </div>
+          </>
         )}
       </div>
 
