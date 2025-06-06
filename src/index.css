@@ -387,14 +387,28 @@ body {
   color: #333;
 }
 
-/* Typing indicator inline - integrated into message form */
-.typing-indicator-inline {
+/* Typing indicator dedicated space - no layout shift */
+.typing-indicator-dedicated {
+  min-height: 40px; /* Reserve space to prevent layout shift */
   padding: 8px 16px;
   margin-bottom: 8px;
   background: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  animation: slideDown 0.3s ease-out;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator-dedicated.hidden {
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+}
+
+.typing-indicator-dedicated.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Typing indicator styles */
@@ -566,8 +580,10 @@ body {
     display: none;
   }
 
-  .typing-indicator {
-    padding: 8px 15px;
+  .typing-indicator-dedicated {
+    min-height: 36px; /* Slightly smaller on mobile */
+    padding: 6px 15px;
+    margin-bottom: 6px;
   }
 
   .typing-content {

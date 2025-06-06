@@ -469,26 +469,30 @@ function App() {
       </div>
 
       <form className="message-form" onSubmit={sendMessage}>
-        {/* Typing indicators - integrated into input container */}
-        {typingUsers.length > 0 && (
-          <div className="typing-indicator-inline" aria-live="polite" role="status">
-            <div className="typing-content">
-              <div className="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <span className="typing-text">
-                {typingUsers.length === 1
-                  ? `${typingUsers[0]} is typing...`
-                  : typingUsers.length === 2
-                  ? `${typingUsers[0]} and ${typingUsers[1]} are typing...`
-                  : `${typingUsers[0]} and ${typingUsers.length - 1} others are typing...`
-                }
-              </span>
+        {/* Typing indicators - dedicated space with no layout shift */}
+        <div
+          className={`typing-indicator-dedicated ${typingUsers.length > 0 ? 'visible' : 'hidden'}`}
+          aria-live="polite"
+          role="status"
+        >
+          <div className="typing-content">
+            <div className="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
+            <span className="typing-text">
+              {typingUsers.length === 1
+                ? `${typingUsers[0]} is typing...`
+                : typingUsers.length === 2
+                ? `${typingUsers[0]} and ${typingUsers[1]} are typing...`
+                : typingUsers.length > 0
+                ? `${typingUsers[0]} and ${typingUsers.length - 1} others are typing...`
+                : ''
+              }
+            </span>
           </div>
-        )}
+        </div>
 
         <div className="input-group">
           <input
