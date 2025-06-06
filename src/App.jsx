@@ -24,6 +24,19 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Load saved username from localStorage on app startup
+  useEffect(() => {
+    try {
+      const savedUsername = localStorage.getItem('chatapp-username')
+      if (savedUsername?.trim()) {
+        setUsername(savedUsername.trim())
+        setIsUsernameSet(true)
+      }
+    } catch (error) {
+      console.warn('Failed to load saved username from localStorage:', error)
+    }
+  }, [])
+
   // Fetch initial messages on component mount
   useEffect(() => {
     fetchMessages()
@@ -253,6 +266,12 @@ function App() {
     e.preventDefault()
     if (!username.trim()) return
 
+    // Save username to localStorage for persistence
+    try {
+      localStorage.setItem('chatapp-username', username.trim())
+    } catch (error) {
+      console.warn('Failed to save username to localStorage:', error)
+    }
     setIsUsernameSet(true)
     setError(null)
   }
@@ -309,6 +328,24 @@ function App() {
     }
   }
 
+  const handleLogout = () => {
+    // Clear saved username from localStorage
+    try {
+      localStorage.removeItem('chatapp-username')
+    } catch (error) {
+      console.warn('Failed to remove username from localStorage:', error)
+    }
+    // Remove presence from server
+    removePresence()
+    // Reset state
+    setUsername('')
+    setIsUsernameSet(false)
+    setMessages([])
+    setOnlineUsers([])
+    setTypingUsers([])
+    setError(null)
+  }
+
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -349,6 +386,9 @@ function App() {
               Join Chat
             </button>
           </div>
+          <p className="profile-persistence-info">
+            💾 Your username will be saved for future visits
+          </p>
         </form>
 
         {error && (
@@ -372,6 +412,14 @@ function App() {
             <div className="user-count">
               👥 {onlineUsers.length} online
             </div>
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              aria-label="Logout and clear saved profile"
+              title="Logout"
+            >
+              🚪
+            </button>
             <button
               className="sidebar-toggle"
               onClick={() => setShowSidebar(!showSidebar)}
