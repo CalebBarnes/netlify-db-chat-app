@@ -4,34 +4,255 @@
   box-sizing: border-box;
 }
 
+/* 🌟 LUMI COMPREHENSIVE THEMING SYSTEM 🌟 */
+/* Addresses Issues #4, #22, #27 - Custom themes, Dark mode, Lumi brand */
+
+:root {
+  /* 🌟 LUMI BRAND THEME (Default) - Warm, soft light */
+  --bg-primary: linear-gradient(135deg, #FFE082 0%, #FFCC02 50%, #FFA500 100%);
+  --bg-secondary: linear-gradient(145deg, #FFFDE7 0%, #FFF8E1 100%);
+  --bg-tertiary: #FFF8E1;
+  --bg-input: #FFFFFF;
+  --bg-header: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+  --bg-message-own: linear-gradient(135deg, #FFCC02 0%, #FF9800 100%);
+  --bg-message-other: #FFFFFF;
+  --bg-sidebar: rgba(255, 248, 225, 0.95);
+
+  --text-primary: #3E2723;
+  --text-secondary: #5D4037;
+  --text-tertiary: #8D6E63;
+  --text-inverse: #FFFFFF;
+  --text-username-own: #E65100;
+  --text-username-other: #FF6F00;
+
+  --border-primary: rgba(255, 193, 7, 0.3);
+  --border-secondary: rgba(255, 152, 0, 0.2);
+  --border-focus: #FF9800;
+
+  --shadow-primary: 0 8px 32px rgba(255, 193, 7, 0.15), 0 4px 16px rgba(255, 152, 0, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(255, 193, 7, 0.1);
+
+  --accent-primary: #FF9800;
+  --accent-secondary: #FFB74D;
+  --accent-mention: #FFC107;
+  --accent-online: #4CAF50;
+  --accent-typing: #FF9800;
+}
+
+/* Galaxy theme specific text contrast improvements */
+[data-theme="galaxy"] .message-content {
+  color: #ffffff !important; /* Starry white text for all messages */
+}
+
+[data-theme="galaxy"] .message:not(.own-message) .message-content {
+  color: #ffffff !important; /* High contrast white text like stars in the galaxy */
+}
+
+[data-theme="galaxy"] .theme-name,
+[data-theme="galaxy"] .theme-description {
+  color: #ffffff !important; /* High contrast for theme dropdown text */
+}
+
+/* Dark theme specific text contrast improvements */
+[data-theme="dark"] .message-content {
+  color: #ffffff !important; /* Ensure high contrast for all message text */
+}
+
+[data-theme="dark"] .message:not(.own-message) .message-content {
+  color: #ffffff !important; /* High contrast white text on dark message bubbles */
+}
+
+[data-theme="dark"] .theme-name,
+[data-theme="dark"] .theme-description {
+  color: #ffffff !important; /* High contrast for theme dropdown text */
+}
+
+/* 🌙 DARK MODE THEME - For @bowo's eyes! */
+[data-theme="dark"] {
+  --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  --bg-secondary: linear-gradient(145deg, #2d3748 0%, #1a202c 100%);
+  --bg-tertiary: #2d3748;
+  --bg-input: #4a5568;
+  --bg-header: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  --bg-message-own: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  --bg-message-other: #2d3748;
+  --bg-sidebar: rgba(45, 55, 72, 0.95);
+
+  --text-primary: #ffffff; /* Improved contrast - pure white */
+  --text-secondary: #f7fafc; /* Improved contrast - very light gray */
+  --text-tertiary: #e2e8f0; /* Improved contrast - light gray */
+  --text-inverse: #1a202c;
+  --text-username-own: #fbb6ce;
+  --text-username-other: #9f7aea;
+
+  --border-primary: rgba(74, 85, 104, 0.5);
+  --border-secondary: rgba(45, 55, 72, 0.3);
+  --border-focus: #9f7aea;
+
+  --shadow-primary: 0 8px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-secondary: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+  --accent-primary: #9f7aea;
+  --accent-secondary: #b794f6;
+  --accent-mention: #fbb6ce;
+  --accent-online: #68d391;
+  --accent-typing: #fbb6ce;
+}
+
+/* 🎨 CUSTOM THEME SYSTEM - For personalization */
+[data-theme="ocean"] {
+  --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-secondary: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 100%);
+  --bg-tertiary: #e0f2fe;
+  --bg-input: #ffffff;
+  --bg-header: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  --bg-message-own: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  --bg-message-other: #ffffff;
+  --bg-sidebar: rgba(240, 249, 255, 0.95);
+
+  --text-primary: #0c4a6e;
+  --text-secondary: #075985;
+  --text-tertiary: #0369a1;
+  --text-inverse: #ffffff;
+  --text-username-own: #0284c7;
+  --text-username-other: #0ea5e9;
+
+  --border-primary: rgba(14, 165, 233, 0.3);
+  --border-secondary: rgba(2, 132, 199, 0.2);
+  --border-focus: #0ea5e9;
+
+  --shadow-primary: 0 8px 32px rgba(14, 165, 233, 0.15), 0 4px 16px rgba(2, 132, 199, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(14, 165, 233, 0.1);
+
+  --accent-primary: #0ea5e9;
+  --accent-secondary: #38bdf8;
+  --accent-mention: #0284c7;
+  --accent-online: #10b981;
+  --accent-typing: #0ea5e9;
+}
+
+/* 🌌 GALAXY THEME - @bowo's starry galaxy idea! */
+[data-theme="galaxy"] {
+  --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  --bg-secondary: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  --bg-tertiary: #16213e;
+  --bg-input: #1a1a2e;
+  --bg-header: linear-gradient(135deg, #16213e 0%, #0f0f23 100%);
+  --bg-message-own: linear-gradient(135deg, #533483 0%, #7209b7 100%);
+  --bg-message-other: #1a1a2e;
+  --bg-sidebar: rgba(26, 26, 46, 0.95);
+
+  --text-primary: #ffffff; /* Improved contrast - pure white for starry text */
+  --text-secondary: #f8fafc; /* Improved contrast - very light for secondary text */
+  --text-tertiary: #e2e8f0; /* Improved contrast - light for tertiary text */
+  --text-inverse: #0f0f23;
+  --text-username-own: #fbbf24; /* Golden star color */
+  --text-username-other: #a78bfa; /* Purple nebula color */
+
+  --border-primary: rgba(167, 139, 250, 0.3);
+  --border-secondary: rgba(251, 191, 36, 0.2);
+  --border-focus: #a78bfa;
+
+  --shadow-primary: 0 8px 32px rgba(167, 139, 250, 0.2), 0 4px 16px rgba(251, 191, 36, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(167, 139, 250, 0.15);
+
+  --accent-primary: #a78bfa;
+  --accent-secondary: #fbbf24;
+  --accent-mention: #fbbf24;
+  --accent-online: #34d399;
+  --accent-typing: #a78bfa;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
-  padding: 20px;
+  padding: 0; /* Remove padding for full screen */
+  margin: 0; /* Ensure no margins */
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .app {
-  max-width: 600px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  margin: 0; /* No margins */
+  background: var(--bg-secondary);
+  border-radius: 0; /* No border radius for full screen */
+  box-shadow: none; /* No shadow for full screen */
+  border: none; /* No border for full screen */
+  overflow: visible; /* Allow dropdowns */
   display: flex;
   flex-direction: column;
-  height: 80vh;
-  min-height: 600px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
 }
 
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px 30px;
+  background: var(--bg-header);
+  color: var(--text-inverse);
+  padding: 24px 30px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: visible; /* Changed from hidden to visible to allow dropdown to show */
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: galaxyShimmer 3s ease-in-out infinite;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.header-left h1 {
+  margin: 0 0 4px 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.header-left p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: galaxyShimmer 3s ease-in-out infinite;
+}
+
+.header h1 {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .header-content {
@@ -120,8 +341,9 @@ body {
 
 .message-form {
   padding: 20px 30px;
-  border-top: 1px solid #eee;
-  background: #f8f9fa;
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .input-group {
@@ -133,29 +355,31 @@ body {
 .message-input {
   flex: 1;
   padding: 15px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.3s ease;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
 
 .username-input:focus,
 .message-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--border-focus);
 }
 
 .join-btn,
 .send-btn {
   padding: 15px 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--bg-header);
+  color: var(--text-inverse);
   border: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background 0.3s ease;
 }
 
 .join-btn:hover,
@@ -212,11 +436,12 @@ body {
 
 .message-username {
   font-weight: 600;
-  color: #667eea;
+  color: var(--text-username-other);
+  transition: color 0.3s ease;
 }
 
 .own-message .message-username {
-  color: #764ba2;
+  color: var(--text-username-own);
 }
 
 .message-time {
@@ -224,20 +449,31 @@ body {
 }
 
 .message-content {
-  background: #E5E5EA; /* iOS gray for received messages */
+  background: var(--bg-message-other);
   padding: 12px 16px;
   border-radius: 18px;
   font-size: 16px;
   line-height: 1.4;
   word-wrap: break-word;
-  color: #000; /* Black text for received messages */
-  max-width: 85%; /* Better mobile space usage */
+  color: var(--text-primary);
+  max-width: 85%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-secondary);
+  border: 1px solid var(--border-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.message-content:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-primary);
 }
 
 .own-message .message-content {
-  background: #007AFF; /* iOS blue for sent messages */
-  color: white;
+  background: var(--bg-message-own);
+  color: var(--text-inverse);
   border-radius: 18px 18px 4px 18px; /* iMessage tail on bottom right */
+  /* Removed animation that was scaling user messages */
 }
 
 .message:not(.own-message) .message-content {
@@ -258,11 +494,12 @@ body {
 /* Sidebar Styles */
 .sidebar {
   width: 250px;
-  background: #f8f9fa;
-  border-left: 1px solid #e1e5e9;
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border-primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 
@@ -526,25 +763,212 @@ body {
   }
 }
 
+/* 🌟 LUMI'S EXPRESSIVE ANIMATIONS - @brendo's depth request! */
+@keyframes lumiGlow {
+  0%, 100% {
+    box-shadow: var(--shadow-primary);
+  }
+  50% {
+    box-shadow: var(--shadow-primary), 0 0 20px var(--accent-primary);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes galaxyShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes warmPulse {
+  0%, 100% {
+    box-shadow: var(--shadow-primary);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: var(--shadow-primary), 0 0 15px var(--accent-secondary);
+    transform: scale(1.02);
+  }
+}
+
+/* 🎨 THEME TOGGLE COMPONENT STYLES */
+.theme-toggle {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-toggle-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Removed problematic animation that made button unstable */
+}
+
+.theme-toggle-btn:hover {
+  background: var(--accent-secondary);
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-primary), 0 0 10px var(--accent-secondary);
+  /* Replaced animation with static glow effect */
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  box-shadow: var(--shadow-primary);
+  min-width: 320px;
+  max-width: 90vw; /* Prevent dropdown from being wider than viewport */
+  z-index: 9999; /* Increased z-index to appear above chat messages */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 12px;
+  background: rgba(255, 248, 225, 0.95); /* Fallback for older browsers */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+}
+
+.theme-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.theme-dropdown-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-header);
+  border-radius: 16px 16px 0 0;
+}
+
+.theme-dropdown-header h4 {
+  margin: 0 0 6px 0;
+  color: var(--text-inverse);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.theme-dropdown-header p {
+  margin: 0;
+  color: var(--text-inverse);
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.theme-option {
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  text-align: left;
+  border-radius: 0;
+}
+
+.theme-option:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(4px);
+}
+
+.theme-option.active {
+  background: var(--accent-secondary);
+  color: var(--text-primary);
+  /* Removed scaling animation to prevent UI instability */
+}
+
+.theme-info {
+  flex: 1;
+}
+
+.theme-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.theme-description {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.theme-preview {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.theme-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-secondary);
+  transition: transform 0.2s ease;
+  /* Removed twinkling animation to prevent scaling issues */
+}
+
+.theme-option:hover .theme-color-dot {
+  transform: scale(1.2);
+}
+
+.theme-dropdown-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-primary);
+  text-align: center;
+  background: var(--bg-tertiary);
+  border-radius: 0 0 16px 16px;
+}
+
+.theme-dropdown-footer small {
+  color: var(--text-tertiary);
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* Duplicate theme toggle styles removed - using the first definition above */
+
+/* Duplicate CSS rules removed - keeping only the first complete definition above */
+
 @media (max-width: 768px) {
-  /* Fix mobile viewport issues - eliminate purple background */
-  body {
-    margin: 0;
-    padding: 0 !important; /* Override the 20px padding that causes purple edges */
-    overflow-x: hidden;
+  /* Body styling is already consistent - no mobile overrides needed */
+
+  /* Fix theme dropdown positioning on mobile */
+  .theme-dropdown {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px) scale(0.95);
+    min-width: 280px;
+    max-width: calc(100vw - 40px); /* Leave 20px margin on each side */
   }
 
-  .app {
-    margin: 0 !important; /* Force remove any margins */
-    padding: 0;
-    border-radius: 0;
-    height: 100vh; /* Full viewport height on mobile */
-    min-height: 100vh;
-    width: 100vw; /* Full viewport width */
-    max-width: 100vw;
-    box-sizing: border-box;
-    position: relative;
+  .theme-dropdown.show {
+    transform: translateX(-50%) translateY(0) scale(1);
   }
+
+  /* App container is already full screen - no mobile overrides needed */
 
   /* URGENT: Massive header size fix - reduce from 20px 30px to minimal */
   .header {
@@ -640,51 +1064,16 @@ body {
     flex-direction: column; /* Stack messages vertically like iMessage */
   }
 
-  /* iMessage-style mobile optimizations */
+  /* Keep consistent styling between mobile and desktop */
   .message {
-    margin-bottom: 2px; /* Very tight iMessage-style spacing */
-    max-width: 85%; /* Better mobile width - more space efficient */
-  }
-
-  /* iMessage-style consecutive message grouping */
-  .message + .message {
-    margin-top: 1px; /* Minimal gap between consecutive messages */
-  }
-
-  /* Larger gap between different users - like iMessage */
-  .message:not(.own-message) + .message.own-message,
-  .message.own-message + .message:not(.own-message) {
-    margin-top: 16px; /* Clear separation between different users */
+    margin-bottom: 20px; /* Same as desktop */
+    max-width: 70%; /* Same as desktop */
   }
 
   .message-content {
-    padding: 10px 14px; /* Slightly reduced padding for mobile */
-    border-radius: 16px; /* More rounded like iMessage bubbles */
-    font-size: 15px; /* Slightly smaller for mobile readability */
-  }
-
-  /* Enhanced bubble design for mobile - EXACT iMessage style */
-  .own-message {
-    align-self: flex-end; /* Right align like iMessage sent messages */
-    margin-left: 20%; /* Create space on left like iMessage */
-  }
-
-  .own-message .message-content {
-    border-radius: 18px 18px 4px 18px; /* iMessage-style tail on bottom right */
-    background: #007AFF; /* iOS blue color */
-    margin-left: auto; /* Push to right */
-  }
-
-  .message:not(.own-message) {
-    align-self: flex-start; /* Left align like iMessage received messages */
-    margin-right: 20%; /* Create space on right like iMessage */
-  }
-
-  .message:not(.own-message) .message-content {
-    border-radius: 18px 18px 18px 4px; /* iMessage-style tail on bottom left */
-    background: #E5E5EA; /* iOS gray color */
-    color: #000; /* Black text on gray background */
-    margin-right: auto; /* Push to left */
+    padding: 12px 16px; /* Same as desktop */
+    border-radius: 18px; /* Same as desktop */
+    font-size: 16px; /* Same as desktop */
   }
 
   .input-group {
