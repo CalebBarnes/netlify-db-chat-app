@@ -96,7 +96,6 @@ export const handler = async (event) => {
         ...headers,
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000", // Cache for 1 year
-        "Content-Length": imageData.data.byteLength.toString(),
       },
       body: Buffer.from(imageData.data).toString("base64"),
       isBase64Encoded: true,

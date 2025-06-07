@@ -33,6 +33,7 @@ const ImageUpload = ({ onImageSelect, disabled = false }) => {
 
   const handleDragOver = (event) => {
     event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
     setDragOver(true)
   }
 

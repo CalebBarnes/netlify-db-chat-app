@@ -63,7 +63,7 @@ const ImagePreview = ({ file, onCancel, onSend, message, setMessage, disabled = 
         <div className="image-preview-content">
           <img
             src={imageUrl}
-            alt="Preview"
+            alt={`Preview of ${file.name}`}
             className="preview-image"
           />
           

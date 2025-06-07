@@ -30,13 +30,6 @@ function generateImageKey(originalName, username) {
 
 // Helper function to validate image file
 function validateImageFile(file, filename) {
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
   const allowedExtensions = ["jpg", "jpeg", "png", "webp", "gif"];
   const maxSize = 10 * 1024 * 1024; // 10MB
 

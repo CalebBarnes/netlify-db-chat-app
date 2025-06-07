@@ -881,7 +881,7 @@ function App() {
                     <div className="message-image-container">
                       <img
                         src={message.image_url}
-                        alt={message.image_filename || 'Uploaded image'}
+                        alt={`Image from ${message.username}${message.image_filename ? ` – ${message.image_filename}` : ''}`}
                         className="message-image"
                         onClick={() => handleImageClick(message.image_url, message.image_filename)}
                         loading="lazy"
@@ -1020,7 +1020,7 @@ function App() {
           <button
             type="submit"
             className="send-btn"
-            disabled={submitting || !newMessage.trim()}
+            disabled={submitting || uploadingImage || !newMessage.trim()}
             aria-label={submitting ? 'Sending message...' : 'Send message'}
             title={submitting ? 'Sending...' : 'Send'}
           >
