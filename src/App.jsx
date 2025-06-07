@@ -193,6 +193,51 @@ const ActionsMenu = React.memo(({ showActionsMenu, onFileUploadClick }) => {
   )
 })
 
+// @ Mentions Autocomplete Component
+const MentionsAutocomplete = React.memo(({
+  show,
+  users,
+  selectedIndex,
+  onSelect,
+  position
+}) => {
+  if (!show || !users.length) return null
+
+  return (
+    <div
+      className="mentions-autocomplete"
+      style={{
+        position: 'absolute',
+        bottom: position?.bottom || '60px',
+        left: position?.left || '60px',
+        zIndex: 1001
+      }}
+    >
+      <div className="mentions-autocomplete-content">
+        <div className="mentions-autocomplete-header">
+          <span>@ Mention Users</span>
+        </div>
+        {users.map((user, index) => (
+          <button
+            key={user.username}
+            type="button"
+            className={`mention-item ${index === selectedIndex ? 'selected' : ''}`}
+            onClick={() => onSelect(user)}
+            title={`Mention ${user.username}`}
+          >
+            <div className="mention-user-info">
+              <span className="mention-username">@{user.username}</span>
+              <span className="mention-status">
+                {user.is_typing ? 'typing...' : 'online'}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+})
+
 // Request notification permission
 const requestNotificationPermission = async () => {
   if ('Notification' in window) {
@@ -341,6 +386,13 @@ function App() {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [showActionsMenu, setShowActionsMenu] = useState(false)
   const [lightboxImage, setLightboxImage] = useState(null)
+
+  // @ Mentions autocomplete states
+  const [showMentionsAutocomplete, setShowMentionsAutocomplete] = useState(false)
+  const [mentionQuery, setMentionQuery] = useState('')
+  const [mentionStartPos, setMentionStartPos] = useState(0)
+  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0)
+  const [filteredUsers, setFilteredUsers] = useState([])
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -847,11 +899,12 @@ function App() {
   }
 
   const handleMessageInputChange = (e) => {
-    setNewMessage(e.target.value)
+    const value = e.target.value
+    const cursorPos = e.target.selectionStart
+    setNewMessage(value)
 
     // Discord-style auto-resize: only expand if content has line breaks or overflows
     const textarea = e.target
-    const value = e.target.value
 
     // Reset to single line height first
     textarea.style.height = 'auto'
@@ -868,18 +921,113 @@ function App() {
       textarea.style.height = singleLineHeight + 'px'
     }
 
+    // Check for @ mentions autocomplete
+    handleMentionDetection(value, cursorPos)
+
     // Trigger typing indicator when user starts typing
-    if (e.target.value.trim().length > 0) {
+    if (value.trim().length > 0) {
       handleTypingStart()
     } else if (isTyping) {
       handleTypingStop()
     }
   }
 
+  // Handle @ mention detection and autocomplete
+  const handleMentionDetection = (value, cursorPos) => {
+    // Find the last @ before the cursor position
+    const textBeforeCursor = value.substring(0, cursorPos)
+    const lastAtIndex = textBeforeCursor.lastIndexOf('@')
+
+    if (lastAtIndex === -1) {
+      // No @ found, hide autocomplete
+      setShowMentionsAutocomplete(false)
+      return
+    }
+
+    // Check if there's a space between @ and cursor (which would end the mention)
+    const textAfterAt = textBeforeCursor.substring(lastAtIndex + 1)
+    if (textAfterAt.includes(' ') || textAfterAt.includes('\n')) {
+      setShowMentionsAutocomplete(false)
+      return
+    }
+
+    // Check if @ is at start of message or preceded by whitespace
+    const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : ' '
+    if (charBeforeAt !== ' ' && charBeforeAt !== '\n' && lastAtIndex !== 0) {
+      setShowMentionsAutocomplete(false)
+      return
+    }
+
+    // Extract the query after @
+    const query = textAfterAt.toLowerCase()
+    setMentionQuery(query)
+    setMentionStartPos(lastAtIndex)
+
+    // Filter users based on query
+    const filtered = onlineUsers.filter(user =>
+      user.username.toLowerCase().includes(query) &&
+      user.username !== username.trim()
+    )
+
+    setFilteredUsers(filtered)
+    setSelectedMentionIndex(0)
+    setShowMentionsAutocomplete(filtered.length > 0)
+  }
+
+  // Handle mention selection
+  const handleMentionSelect = (user) => {
+    const beforeMention = newMessage.substring(0, mentionStartPos)
+    const afterCursor = newMessage.substring(messageInputRef.current.selectionStart)
+    const newValue = beforeMention + `@${user.username} ` + afterCursor
+
+    setNewMessage(newValue)
+    setShowMentionsAutocomplete(false)
+
+    // Focus back to input and position cursor after the mention
+    setTimeout(() => {
+      if (messageInputRef.current) {
+        const newCursorPos = beforeMention.length + user.username.length + 2 // +2 for @ and space
+        messageInputRef.current.focus()
+        messageInputRef.current.setSelectionRange(newCursorPos, newCursorPos)
+      }
+    }, 0)
+  }
+
   // Handle Discord-style keyboard shortcuts
   const handleKeyDown = (e) => {
-    // Enter without Shift = send message
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // Handle mentions autocomplete navigation
+    if (showMentionsAutocomplete && filteredUsers.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedMentionIndex(prev =>
+          prev < filteredUsers.length - 1 ? prev + 1 : 0
+        )
+        return
+      }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedMentionIndex(prev =>
+          prev > 0 ? prev - 1 : filteredUsers.length - 1
+        )
+        return
+      }
+
+      if (e.key === 'Tab' || e.key === 'Enter') {
+        e.preventDefault()
+        handleMentionSelect(filteredUsers[selectedMentionIndex])
+        return
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setShowMentionsAutocomplete(false)
+        return
+      }
+    }
+
+    // Enter without Shift = send message (only if not in mentions autocomplete)
+    if (e.key === 'Enter' && !e.shiftKey && !showMentionsAutocomplete) {
       e.preventDefault()
       sendMessage(e)
     }
@@ -1446,6 +1594,15 @@ function App() {
               showActionsMenu={showActionsMenu}
               onFileUploadClick={handleFileUploadClick}
             />
+
+            <MentionsAutocomplete
+              show={showMentionsAutocomplete}
+              users={filteredUsers}
+              selectedIndex={selectedMentionIndex}
+              onSelect={handleMentionSelect}
+              position={{ bottom: '60px', left: '60px' }}
+            />
+
             {/* Hidden file input for upload functionality */}
             <ImageUpload
               ref={fileInputRef}
