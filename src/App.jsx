@@ -725,8 +725,8 @@ function App() {
       // Detect new users coming online (for sound notification)
       const previousUsernames = onlineUsers.map(user => user.username)
       const currentUsernames = users.map(user => user.username)
-      const newUsers = currentUsernames.filter(username =>
-        !previousUsernames.includes(username) && username !== username.trim()
+      const newUsers = currentUsernames.filter(u =>
+        !previousUsernames.includes(u) && u !== username.trim()
       )
 
       // Play user online sound for new users (but not on initial load)
