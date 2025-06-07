@@ -4,6 +4,8 @@ import DOMPurify from 'dompurify'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
+import SpotifyAuth from './SpotifyAuth'
+import JamSession from './JamSession'
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -306,6 +308,11 @@ function App() {
   const [imageMessage, setImageMessage] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
   const [lightboxImage, setLightboxImage] = useState(null)
+
+  // Spotify integration states
+  const [isSpotifyConnected, setIsSpotifyConnected] = useState(false)
+  const [spotifyUserId, setSpotifyUserId] = useState(null)
+  const [showJamSession, setShowJamSession] = useState(false)
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -949,6 +956,20 @@ function App() {
     setLightboxImage(null)
   }
 
+  // Spotify authentication handlers
+  const handleSpotifyAuthChange = (connected, userId) => {
+    setIsSpotifyConnected(connected)
+    setSpotifyUserId(userId)
+  }
+
+  const handleJamSessionOpen = () => {
+    setShowJamSession(true)
+  }
+
+  const handleJamSessionClose = () => {
+    setShowJamSession(false)
+  }
+
   if (loading) {
     return (
       <div className="app">
@@ -1011,6 +1032,14 @@ function App() {
             <div className="user-count">
               👥 {onlineUsers.length} online
             </div>
+            <button
+              className="settings-btn"
+              onClick={handleJamSessionOpen}
+              aria-label="Open Spotify jam sessions"
+              title="Spotify Jam Sessions"
+            >
+              🎵
+            </button>
             <button
               className="settings-btn"
               onClick={() => setShowSettingsMenu(!showSettingsMenu)}
@@ -1096,6 +1125,14 @@ function App() {
               >
                 ✕
               </button>
+            </div>
+
+            <div className="settings-section">
+              <h4>🎵 Spotify Integration</h4>
+              <SpotifyAuth
+                username={username}
+                onAuthChange={handleSpotifyAuthChange}
+              />
             </div>
 
             <div className="settings-section">
@@ -1398,6 +1435,15 @@ function App() {
             onClick={(e) => e.stopPropagation()}
           />
         </div>
+      )}
+
+      {/* Spotify Jam Session Modal */}
+      {showJamSession && (
+        <JamSession
+          username={username}
+          isSpotifyConnected={isSpotifyConnected}
+          onClose={handleJamSessionClose}
+        />
       )}
     </div>
   )

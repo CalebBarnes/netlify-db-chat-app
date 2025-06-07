@@ -119,26 +119,23 @@ class MigrationRunner {
     console.log(`🔄 Applying migration: ${filename}`);
 
     try {
-      // Execute the entire migration in a transaction for atomicity
-      await this.sql.begin(async (tx) => {
-        // Split the migration into individual statements safely
-        const statements = this.splitSqlStatements(content);
+      // Split the migration into individual statements safely
+      const statements = this.splitSqlStatements(content);
 
-        // Execute each statement within the transaction
-        for (const statement of statements) {
-          if (statement.trim()) {
-            await tx.unsafe(statement);
-          }
+      // Execute each statement
+      for (const statement of statements) {
+        if (statement.trim()) {
+          await this.sql.unsafe(statement);
         }
+      }
 
-        // Record that this migration has been applied (within the same transaction)
-        const version = filename.replace(".sql", "");
-        await tx`
-          INSERT INTO schema_migrations (version)
-          VALUES (${version})
-          ON CONFLICT (version) DO NOTHING
-        `;
-      });
+      // Record that this migration has been applied
+      const version = filename.replace(".sql", "");
+      await this.sql`
+        INSERT INTO schema_migrations (version)
+        VALUES (${version})
+        ON CONFLICT (version) DO NOTHING
+      `;
 
       console.log(`✅ Migration ${filename} applied successfully`);
     } catch (error) {
