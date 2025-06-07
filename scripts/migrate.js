@@ -104,9 +104,22 @@ async function runMigrations() {
       CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages(reply_to_id)
     `;
 
+    // Migration 005: Add image support to messages table
+    console.log("Adding image support to messages table...");
+    await sql`
+      ALTER TABLE messages
+      ADD COLUMN IF NOT EXISTS image_url TEXT,
+      ADD COLUMN IF NOT EXISTS image_filename TEXT
+    `;
+
+    console.log("Creating image support index...");
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_messages_image_url ON messages(image_url) WHERE image_url IS NOT NULL
+    `;
+
     console.log("✅ Migration completed successfully!");
     console.log(
-      "🎉 Your chat app with user presence, typing indicators, and reply functionality is ready to use!"
+      "🎉 Your chat app with user presence, typing indicators, reply functionality, and image upload is ready to use!"
     );
   } catch (error) {
     console.error("❌ Migration failed:", error);

@@ -33,7 +33,7 @@ export const handler = async (event) => {
         if (sinceId) {
           // Get messages with ID greater than sinceId (most reliable for real-time polling)
           messages = await sql`
-            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
             FROM messages
             WHERE id > ${parseInt(sinceId)}
             ORDER BY created_at ASC, id ASC
@@ -41,7 +41,7 @@ export const handler = async (event) => {
         } else if (since) {
           // Fallback to timestamp-based filtering
           messages = await sql`
-            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
             FROM messages
             WHERE created_at > ${since}
             ORDER BY created_at ASC, id ASC
@@ -49,7 +49,7 @@ export const handler = async (event) => {
         } else {
           // Get recent messages (last 50)
           messages = await sql`
-            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
+            SELECT id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
             FROM messages
             ORDER BY created_at DESC
             LIMIT 50
@@ -134,11 +134,13 @@ export const handler = async (event) => {
         }
 
         const [newMessage] = await sql`
-          INSERT INTO messages (username, message, created_at, reply_to_id, reply_to_username, reply_preview)
+          INSERT INTO messages (username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename)
           VALUES (${username.trim()}, ${message.trim()}, NOW(), ${
           replyToId || null
-        }, ${replyToUsername || null}, ${replyPreview || null})
-          RETURNING id, username, message, created_at, reply_to_id, reply_to_username, reply_preview
+        }, ${replyToUsername || null}, ${
+          replyPreview || null
+        }, ${null}, ${null})
+          RETURNING id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
         `;
 
         return {

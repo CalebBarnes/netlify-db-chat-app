@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import ThemeToggle from './ThemeToggle'
+import ImageUpload from './ImageUpload'
+import ImagePreview from './ImagePreview'
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -135,6 +137,12 @@ function App() {
 
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
+
+  // Image upload states
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [imageMessage, setImageMessage] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [lightboxImage, setLightboxImage] = useState(null)
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -617,6 +625,91 @@ function App() {
     }
   }
 
+  // Image upload handlers
+  const handleImageSelect = (file) => {
+    setSelectedImage(file)
+    setImageMessage('')
+  }
+
+  const handleImageCancel = () => {
+    setSelectedImage(null)
+    setImageMessage('')
+  }
+
+  const handleImageSend = async (file, message) => {
+    if (!file || uploadingImage) return
+
+    try {
+      setUploadingImage(true)
+      setError(null)
+
+      // Convert file to base64
+      const fileData = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result.split(',')[1]) // Remove data:image/...;base64, prefix
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          filename: file.name,
+          fileData: fileData,
+          message: message || `📷 ${file.name}`,
+          replyToId: replyingTo?.id || null,
+          replyToUsername: replyingTo?.username || null,
+          replyPreview: replyingTo?.message || null
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      setMessages(prev => [...prev, result.message])
+      setLastMessageTime(result.message.created_at)
+      setLastMessageId(result.message.id)
+      lastMessageTimeRef.current = result.message.created_at
+      lastMessageIdRef.current = result.message.id
+
+      // Clear image upload state
+      setSelectedImage(null)
+      setImageMessage('')
+
+      // Remove highlighting from any message being replied to
+      document.querySelectorAll('.message.being-replied-to').forEach(el => {
+        el.classList.remove('being-replied-to')
+      })
+      setReplyingTo(null) // Clear reply state after sending
+
+      // Maintain focus on input field after sending message
+      setTimeout(() => {
+        if (messageInputRef.current) {
+          messageInputRef.current.focus()
+        }
+      }, 0)
+    } catch (err) {
+      console.error('Error uploading image:', err)
+      setError('Failed to upload image. Please try again.')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleImageClick = (imageUrl, filename) => {
+    setLightboxImage({ url: imageUrl, filename })
+  }
+
+  const closeLightbox = () => {
+    setLightboxImage(null)
+  }
+
   if (loading) {
     return (
       <div className="app">
@@ -782,6 +875,24 @@ function App() {
                     className="message-content"
                     dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message, username) }}
                   />
+
+                  {/* Display image if message has one */}
+                  {message.image_url && (
+                    <div className="message-image-container">
+                      <img
+                        src={message.image_url}
+                        alt={message.image_filename || 'Uploaded image'}
+                        className="message-image"
+                        onClick={() => handleImageClick(message.image_url, message.image_filename)}
+                        loading="lazy"
+                      />
+                      {message.image_filename && (
+                        <div className="message-image-filename">
+                          📎 {message.image_filename}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -887,6 +998,10 @@ function App() {
         </div>
 
         <div className="input-group">
+          <ImageUpload
+            onImageSelect={handleImageSelect}
+            disabled={submitting || uploadingImage}
+          />
           <input
             ref={messageInputRef}
             type="text"
@@ -913,6 +1028,36 @@ function App() {
           </button>
         </div>
       </form>
+
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <ImagePreview
+          file={selectedImage}
+          message={imageMessage}
+          setMessage={setImageMessage}
+          onCancel={handleImageCancel}
+          onSend={handleImageSend}
+          disabled={uploadingImage}
+        />
+      )}
+
+      {/* Image Lightbox */}
+      {lightboxImage && (
+        <div className="image-lightbox" onClick={closeLightbox}>
+          <button
+            className="image-lightbox-close"
+            onClick={closeLightbox}
+            aria-label="Close image"
+          >
+            ✕
+          </button>
+          <img
+            src={lightboxImage.url}
+            alt={lightboxImage.filename || 'Image'}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   )
 }
