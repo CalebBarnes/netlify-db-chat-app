@@ -162,6 +162,199 @@
   }
 }
 
+/* 🌈 LUMI'S ANIMATED GRADIENTS - Making Lumi the star of the show! */
+
+/* Base Lumi message gradient variables for all themes */
+:root {
+  --lumi-gradient-1: #FFE082;
+  --lumi-gradient-2: #FFCC02;
+  --lumi-gradient-3: #FFA500;
+  --lumi-animation-speed: 4s;
+  --lumi-glow-color: rgba(255, 193, 7, 0.3);
+  --lumi-glow-hover: rgba(255, 193, 7, 0.5);
+}
+
+/* Lumi Brand Theme Gradients */
+[data-theme="lumi"] {
+  --lumi-gradient-1: #FFE082;
+  --lumi-gradient-2: #FFCC02;
+  --lumi-gradient-3: #FFA500;
+  --lumi-animation-speed: 4s;
+  --lumi-glow-color: rgba(255, 193, 7, 0.3);
+  --lumi-glow-hover: rgba(255, 193, 7, 0.5);
+}
+
+/* Dark Theme Gradients - Soft moonlit colors */
+[data-theme="dark"] {
+  --lumi-gradient-1: #667eea;
+  --lumi-gradient-2: #764ba2;
+  --lumi-gradient-3: #667eea;
+  --lumi-animation-speed: 5s;
+  --lumi-glow-color: rgba(102, 126, 234, 0.3);
+  --lumi-glow-hover: rgba(102, 126, 234, 0.5);
+}
+
+/* Galaxy Theme Gradients - Cosmic starry colors */
+[data-theme="galaxy"] {
+  --lumi-gradient-1: #1a1a2e;
+  --lumi-gradient-2: #533483;
+  --lumi-gradient-3: #0f3460;
+  --lumi-animation-speed: 6s;
+  --lumi-glow-color: rgba(83, 52, 131, 0.4);
+  --lumi-glow-hover: rgba(83, 52, 131, 0.6);
+}
+
+/* Ocean Theme Gradients - Flowing water colors */
+[data-theme="ocean"] {
+  --lumi-gradient-1: #74b9ff;
+  --lumi-gradient-2: #0984e3;
+  --lumi-gradient-3: #74b9ff;
+  --lumi-animation-speed: 4.5s;
+  --lumi-glow-color: rgba(116, 185, 255, 0.3);
+  --lumi-glow-hover: rgba(116, 185, 255, 0.5);
+}
+
+/* Purple Theme Gradients - Elegant purple flow */
+[data-theme="purple"] {
+  --lumi-gradient-1: #8b5cf6;
+  --lumi-gradient-2: #7c3aed;
+  --lumi-gradient-3: #8b5cf6;
+  --lumi-animation-speed: 4.2s;
+  --lumi-glow-color: rgba(139, 92, 246, 0.3);
+  --lumi-glow-hover: rgba(139, 92, 246, 0.5);
+}
+
+/* Lumi's Animated Gradient Messages */
+.lumi-message .message-content {
+  background: linear-gradient(
+    45deg,
+    var(--lumi-gradient-1) 0%,
+    var(--lumi-gradient-2) 25%,
+    var(--lumi-gradient-3) 50%,
+    var(--lumi-gradient-2) 75%,
+    var(--lumi-gradient-1) 100%
+  ) !important;
+  background-size: 400% 400% !important;
+  animation: lumiExpression var(--lumi-animation-speed) ease-in-out infinite !important;
+  box-shadow: 0 4px 15px var(--lumi-glow-color), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Lumi's gradient animation keyframes */
+@keyframes lumiExpression {
+  0%, 100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.01);
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Enhanced hover effects for Lumi's messages */
+.lumi-message .message-content:hover {
+  animation-duration: calc(var(--lumi-animation-speed) * 0.5) !important;
+  transform: scale(1.02) translateY(-2px) !important;
+  box-shadow: 0 6px 25px var(--lumi-glow-hover), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Breathing glow effect for Lumi's messages */
+.lumi-message .message-content::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--lumi-gradient-1),
+    var(--lumi-gradient-2),
+    var(--lumi-gradient-3),
+    var(--lumi-gradient-2),
+    var(--lumi-gradient-1)
+  );
+  background-size: 400% 400%;
+  border-radius: 20px;
+  z-index: -1;
+  animation: lumiGlowPulse calc(var(--lumi-animation-speed) * 1.5) ease-in-out infinite;
+  opacity: 0.6;
+  filter: blur(4px);
+}
+
+@keyframes lumiGlowPulse {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.4;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.8;
+  }
+}
+
+/* Special Galaxy theme sparkle effect for Lumi */
+[data-theme="galaxy"] .lumi-message .message-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: galaxySparkle 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes galaxySparkle {
+  0% {
+    background-position: 0px 0px, 10px 10px;
+    opacity: 0.3;
+  }
+  50% {
+    background-position: 10px 10px, 20px 20px;
+    opacity: 0.6;
+  }
+  100% {
+    background-position: 20px 20px, 30px 30px;
+    opacity: 0.3;
+  }
+}
+
+/* Accessibility: Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .lumi-message .message-content {
+    animation: none !important;
+    background: var(--lumi-gradient-1) !important;
+    background-size: 100% 100% !important;
+  }
+
+  .lumi-message .message-content::before,
+  .lumi-message .message-content::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Performance optimization: Pause animations when page is not visible */
+.page-hidden .lumi-message .message-content,
+.page-hidden .lumi-message .message-content::before,
+.page-hidden .lumi-message .message-content::after {
+  animation-play-state: paused !important;
+}
+
 /* Galaxy theme specific text contrast improvements */
 [data-theme="galaxy"] .message-content {
   color: #ffffff !important; /* Starry white text for all messages */

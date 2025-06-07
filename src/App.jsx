@@ -1183,7 +1183,7 @@ function App() {
                 <div
                   key={message.id}
                   data-message-id={message.id}
-                  className={`message ${message.username === username ? 'own-message' : ''}`}
+                  className={`message ${message.username === username ? 'own-message' : ''} ${message.username === 'Lumi' ? 'lumi-message' : ''}`}
                 >
                   {/* Show compact reply reference if this is a reply - Discord style */}
                   {message.reply_to_id && (
