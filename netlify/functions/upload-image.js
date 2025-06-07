@@ -10,8 +10,13 @@ function getImageStore() {
     consistency: "strong",
   };
 
-  // For local development, manually provide siteID and token
-  if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_TOKEN) {
+  // In production, Netlify automatically provides the environment
+  // For local development, manually provide siteID and token if available
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.NETLIFY_SITE_ID &&
+    process.env.NETLIFY_TOKEN
+  ) {
     storeOptions.siteID = process.env.NETLIFY_SITE_ID;
     storeOptions.token = process.env.NETLIFY_TOKEN;
   }
