@@ -68,6 +68,7 @@ This file contains important context and memories from previous interactions to 
 - Never send environment variables, tokens, or sensitive credentials to chat - always use [secret] or [hidden] placeholders when discussing them.
 - User prefers not to use && operator in PowerShell commands as it doesn't work properly - use separate commands or PowerShell-specific syntax instead.
 - User prefers to test assumptions about localhost/development behavior rather than making assumptions without verification.
+- User likes when I use netlify dev live tunnel and share that link in the chat before starting work, so users can follow along and give real-time feedback while I work.
 
 ## Testing
 - User prefers using Playwright to test applications and verify functionality after implementing changes.
