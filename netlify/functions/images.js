@@ -55,9 +55,11 @@ export const handler = async (event) => {
   }
 
   try {
-    // Extract image key from path
+    // Extract image key from path: /api/images/username/filename
     const pathParts = event.path.split("/");
-    const imageKey = pathParts[pathParts.length - 1];
+    const username = pathParts[pathParts.length - 2];
+    const filename = pathParts[pathParts.length - 1];
+    const imageKey = `${username}/${filename}`;
 
     if (!imageKey) {
       return {
