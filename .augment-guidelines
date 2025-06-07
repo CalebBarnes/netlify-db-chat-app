@@ -79,6 +79,8 @@ This file contains important context and memories from previous interactions to 
 ## Workflow
 - When user sends just "." it means "continue workflow" - same as typing "continue workflow".
 - User prefers to focus on completing current PRs, addressing all feedback, and ensuring thorough completion before moving to new development work.
+- User prefers natural, conversational chat messages instead of formal product manager-style status updates when talking to chat users.
+- When interacting with Lumi chat users, use natural conversational language instead of formal status updates, but when talking directly with Caleb, detailed technical communication is appropriate.
 
 ## Technical Implementation Notes
 - This project uses Netlify DB for data persistence
