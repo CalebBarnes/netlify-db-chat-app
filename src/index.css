@@ -1619,3 +1619,223 @@ body {
 .notification-dismiss-btn:hover {
   background: #bbdefb; /* 4.61:1 contrast with #1976d2 - WCAG AA compliant */
 }
+
+/* Settings Button */
+.settings-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.settings-btn:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+}
+
+.settings-btn:active {
+  transform: translateY(0);
+}
+
+/* Settings Menu Dropdown */
+.settings-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 998;
+  backdrop-filter: blur(2px);
+}
+
+.settings-menu {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  overflow: hidden;
+  animation: settingsMenuSlideIn 0.2s ease-out;
+}
+
+@keyframes settingsMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.settings-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.settings-menu-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.settings-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.settings-close-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.settings-section {
+  padding: 20px;
+}
+
+.settings-section h4 {
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.setting-item input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.volume-control input[type="range"] {
+  flex: 1;
+  height: 6px;
+  background: var(--border-primary);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sound-test-btn {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.sound-test-btn:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.sound-test-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive settings menu */
+@media (max-width: 768px) {
+  .settings-menu {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .volume-control {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .volume-control input[type="range"] {
+    width: 100%;
+  }
+}
