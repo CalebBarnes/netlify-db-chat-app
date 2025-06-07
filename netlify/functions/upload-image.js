@@ -6,7 +6,7 @@ const sql = neon();
 // Helper function to get the appropriate store based on environment
 function getImageStore() {
   // Use global store for production, deploy store for development/preview
-  if (process.env.CONTEXT === 'production') {
+  if (process.env.CONTEXT === "production") {
     return getStore("chat-images");
   }
   return getStore("chat-images-dev");
@@ -16,25 +16,31 @@ function getImageStore() {
 function generateImageKey(originalName, username) {
   const timestamp = Date.now();
   const randomId = Math.random().toString(36).substring(2, 15);
-  const extension = originalName.split('.').pop().toLowerCase();
+  const extension = originalName.split(".").pop().toLowerCase();
   return `${username}/${timestamp}-${randomId}.${extension}`;
 }
 
 // Helper function to validate image file
 function validateImageFile(file, filename) {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-  const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+  ];
+  const allowedExtensions = ["jpg", "jpeg", "png", "webp", "gif"];
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   // Check file size
   if (file.length > maxSize) {
-    throw new Error('File size too large. Maximum size is 10MB.');
+    throw new Error("File size too large. Maximum size is 10MB.");
   }
 
   // Check file extension
-  const extension = filename.split('.').pop().toLowerCase();
+  const extension = filename.split(".").pop().toLowerCase();
   if (!allowedExtensions.includes(extension)) {
-    throw new Error('Invalid file type. Allowed types: JPG, PNG, WebP, GIF');
+    throw new Error("Invalid file type. Allowed types: JPG, PNG, WebP, GIF");
   }
 
   return true;
@@ -67,7 +73,7 @@ export const handler = async (event) => {
 
   try {
     const { body } = event;
-    
+
     if (!body) {
       return {
         statusCode: 400,
@@ -76,18 +82,7 @@ export const handler = async (event) => {
       };
     }
 
-    // Parse multipart form data (simplified for now - in production would use a proper parser)
-    const boundary = event.headers['content-type']?.split('boundary=')[1];
-    if (!boundary) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: "Invalid content type. Expected multipart/form-data" }),
-      };
-    }
-
-    // For now, we'll expect base64 encoded data in JSON format
-    // In a full implementation, we'd parse multipart/form-data properly
+    // Parse JSON request data
     let requestData;
     try {
       requestData = JSON.parse(body);
@@ -99,36 +94,46 @@ export const handler = async (event) => {
       };
     }
 
-    const { username, filename, fileData, message, replyToId, replyToUsername, replyPreview } = requestData;
+    const {
+      username,
+      filename,
+      fileData,
+      message,
+      replyToId,
+      replyToUsername,
+      replyPreview,
+    } = requestData;
 
     if (!username || !filename || !fileData) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: "Username, filename, and file data are required" }),
+        body: JSON.stringify({
+          error: "Username, filename, and file data are required",
+        }),
       };
     }
 
     // Decode base64 file data
-    const fileBuffer = Buffer.from(fileData, 'base64');
-    
+    const fileBuffer = Buffer.from(fileData, "base64");
+
     // Validate the image file
     validateImageFile(fileBuffer, filename);
 
     // Generate unique key for the image
     const imageKey = generateImageKey(filename, username);
-    
+
     // Get the blob store
     const store = getImageStore();
-    
+
     // Store the image in Netlify Blobs
     await store.set(imageKey, fileBuffer, {
       metadata: {
         originalName: filename,
         username: username,
         uploadedAt: new Date().toISOString(),
-        size: fileBuffer.length
-      }
+        size: fileBuffer.length,
+      },
     });
 
     // Create the image URL
@@ -136,12 +141,14 @@ export const handler = async (event) => {
 
     // Save message with image to database
     const messageText = message || `📷 ${filename}`;
-    
+
     const [newMessage] = await sql`
       INSERT INTO messages (username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename)
       VALUES (${username.trim()}, ${messageText}, NOW(), ${
       replyToId || null
-    }, ${replyToUsername || null}, ${replyPreview || null}, ${imageUrl}, ${filename})
+    }, ${replyToUsername || null}, ${
+      replyPreview || null
+    }, ${imageUrl}, ${filename})
       RETURNING id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
     `;
 
@@ -150,10 +157,9 @@ export const handler = async (event) => {
       headers,
       body: JSON.stringify({
         message: newMessage,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
       }),
     };
-
   } catch (error) {
     console.error("Error in upload-image function:", error);
     return {

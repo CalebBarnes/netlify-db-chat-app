@@ -44,6 +44,26 @@
   --panel-text: #333333;
   --panel-border: #e1e5e9;
   --username-color: #333333;
+
+  /* Image upload modal variables */
+  --bg-color: #FFFFFF;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(255, 193, 7, 0.15);
 }
 
 /* Galaxy theme specific text contrast improvements */
@@ -111,6 +131,26 @@
   --panel-text: #ffffff;
   --panel-border: #4a5568;
   --username-color: #ffffff;
+
+  /* Image upload modal variables */
+  --bg-color: #2d3748;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
 /* 🎨 CUSTOM THEME SYSTEM - For personalization */
@@ -150,6 +190,26 @@
   --panel-text: #0c4a6e;
   --panel-border: rgba(14, 165, 233, 0.3);
   --username-color: #0c4a6e;
+
+  /* Image upload modal variables */
+  --bg-color: #ffffff;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(14, 165, 233, 0.15);
 }
 
 /* 🌌 GALAXY THEME - @bowo's starry galaxy idea! */
@@ -189,6 +249,26 @@
   --panel-text: #ffffff;
   --panel-border: rgba(167, 139, 250, 0.3);
   --username-color: #ffffff;
+
+  /* Image upload modal variables */
+  --bg-color: #1a1a2e;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(167, 139, 250, 0.2);
 }
 
 body {
