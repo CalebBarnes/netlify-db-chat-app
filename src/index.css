@@ -224,6 +224,16 @@
   --lumi-glow-hover: rgba(139, 92, 246, 0.5);
 }
 
+/* Kawaii Theme Gradients - Soft pastel kawaii flow */
+[data-theme="kawaii"] {
+  --lumi-gradient-1: #ffb3d9;
+  --lumi-gradient-2: #fff2b3;
+  --lumi-gradient-3: #e6ccff;
+  --lumi-animation-speed: 3.8s;
+  --lumi-glow-color: rgba(255, 179, 217, 0.4);
+  --lumi-glow-hover: rgba(255, 179, 217, 0.6);
+}
+
 /* Lumi's Animated Gradient Messages */
 .lumi-message .message-content {
   background: linear-gradient(
@@ -634,6 +644,335 @@
 [data-theme="purple"] .theme-name,
 [data-theme="purple"] .theme-description {
   color: #581c87 !important; /* High contrast for theme dropdown text */
+}
+
+/* 🌸 KAWAII PASTEL THEME - @bowo's cute pastel dream! */
+[data-theme="kawaii"] {
+  --bg-primary: linear-gradient(135deg, #fff0f5 0%, #fff8dc 50%, #f0f8ff 100%);
+  --bg-secondary: linear-gradient(145deg, #fef7f7 0%, #fffbf0 100%);
+  --bg-tertiary: #fffbf0;
+  --bg-input: #ffffff;
+  --bg-header: linear-gradient(135deg, #ffb3d9 0%, #fff2b3 100%);
+  --bg-message-own: linear-gradient(135deg, #ffb3d9 0%, #fff2b3 100%);
+  --bg-message-other: #ffffff;
+  --bg-sidebar: rgba(255, 251, 240, 0.95);
+
+  --text-primary: #8b4a6b;
+  --text-secondary: #a67c8a;
+  --text-tertiary: #c9a9b8;
+  --text-inverse: #ffffff;
+  --text-username-own: #d946ef;
+  --text-username-other: #ec4899;
+
+  --border-primary: rgba(255, 179, 217, 0.3);
+  --border-secondary: rgba(255, 242, 179, 0.2);
+  --border-focus: #ec4899;
+
+  --shadow-primary: 0 8px 32px rgba(255, 179, 217, 0.15), 0 4px 16px rgba(255, 242, 179, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(255, 179, 217, 0.1);
+
+  --accent-primary: #ec4899;
+  --accent-secondary: #f9a8d4;
+  --accent-mention: #d946ef;
+  --accent-online: #10b981;
+  --accent-typing: #ec4899;
+
+  /* Kawaii theme contrast variables for better readability */
+  --heading-color: #8b4a6b;
+  --panel-background: rgba(255, 251, 240, 0.95);
+  --panel-text: #8b4a6b;
+  --panel-border: rgba(255, 179, 217, 0.3);
+  --username-color: #8b4a6b;
+
+  /* Image upload modal variables */
+  --bg-color: #ffffff;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(255, 179, 217, 0.15);
+}
+
+/* Kawaii theme specific styling and cute cloud decorations */
+[data-theme="kawaii"] .app {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating cloud background */
+[data-theme="kawaii"] .app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(ellipse 60px 30px at 100px 50px, rgba(255, 255, 255, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse 80px 40px at 300px 120px, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 50px 25px at 500px 80px, rgba(255, 255, 255, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse 70px 35px at 200px 200px, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 90px 45px at 600px 300px, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 40px 20px at 150px 400px, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+  animation: floatingClouds 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes floatingClouds {
+  0%, 100% { transform: translateX(0px) translateY(0px); }
+  25% { transform: translateX(10px) translateY(-5px); }
+  50% { transform: translateX(-5px) translateY(10px); }
+  75% { transform: translateX(15px) translateY(5px); }
+}
+
+/* Kawaii header cloud decoration */
+[data-theme="kawaii"] .header::after {
+  content: '☁️ ☁️ ☁️';
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 1.2rem;
+  opacity: 0.6;
+  animation: gentleBob 3s ease-in-out infinite;
+}
+
+@keyframes gentleBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Kawaii message bubbles with rounded corners */
+[data-theme="kawaii"] .message-content {
+  border-radius: 25px;
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 4px 15px var(--shadow-color);
+  position: relative;
+}
+
+[data-theme="kawaii"] .own-message .message-content {
+  border: 2px solid var(--accent-primary);
+  border-radius: 25px 25px 8px 25px; /* Kawaii bubble tail */
+}
+
+[data-theme="kawaii"] .message:not(.own-message) .message-content {
+  border-radius: 25px 25px 25px 8px; /* Kawaii bubble tail */
+}
+
+/* Kawaii bubble tails */
+[data-theme="kawaii"] .message-content::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+[data-theme="kawaii"] .own-message .message-content::before {
+  bottom: -8px;
+  right: 20px;
+  border-width: 8px 8px 0 8px;
+  border-color: var(--accent-primary) transparent transparent transparent;
+}
+
+[data-theme="kawaii"] .message:not(.own-message) .message-content::before {
+  bottom: -8px;
+  left: 20px;
+  border-width: 8px 8px 0 8px;
+  border-color: var(--border-primary) transparent transparent transparent;
+}
+
+/* Kawaii buttons with soft styling */
+[data-theme="kawaii"] button {
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+[data-theme="kawaii"] button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 179, 217, 0.4);
+}
+
+[data-theme="kawaii"] button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 5px rgba(255, 179, 217, 0.3);
+}
+
+/* Kawaii input fields */
+[data-theme="kawaii"] input {
+  border-radius: 25px;
+  border: 2px solid var(--accent-primary);
+  box-shadow: inset 0 2px 5px rgba(255, 179, 217, 0.1);
+  transition: all 0.3s ease;
+}
+
+[data-theme="kawaii"] input:focus {
+  border-color: var(--accent-mention);
+  box-shadow:
+    inset 0 2px 5px rgba(255, 179, 217, 0.1),
+    0 0 0 3px rgba(255, 242, 179, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="kawaii"] input::placeholder {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Kawaii gentle pulse animation for messages */
+@keyframes kawaiiPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(255, 179, 217, 0.3);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 6px 20px rgba(255, 179, 217, 0.4);
+  }
+}
+
+[data-theme="kawaii"] .message-content:hover {
+  animation: kawaiiPulse 2s ease-in-out;
+}
+
+/* Kawaii sparkle effects */
+[data-theme="kawaii"] .message-content.sparkle {
+  position: relative;
+}
+
+[data-theme="kawaii"] .message-content.sparkle::after {
+  content: '✨';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 0.8rem;
+  animation: sparkleRotate 2s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes sparkleRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Kawaii floating hearts background effect */
+[data-theme="kawaii"] .messages-list {
+  position: relative;
+}
+
+[data-theme="kawaii"] .messages-list::before {
+  content: '💖 💕 💜 💛';
+  position: fixed;
+  top: 20%;
+  left: 10%;
+  font-size: 1.5rem;
+  opacity: 0.1;
+  animation: floatingHearts 15s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes floatingHearts {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  50% { transform: translateY(10px) rotate(-3deg); }
+  75% { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* Kawaii typography */
+[data-theme="kawaii"] {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+}
+
+[data-theme="kawaii"] h1 {
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px rgba(255, 179, 217, 0.3);
+  font-weight: 600;
+}
+
+[data-theme="kawaii"] .message-username {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(255, 179, 217, 0.2);
+}
+
+/* Kawaii emoji enhancement */
+[data-theme="kawaii"] .message-content img.emoji {
+  transform: scale(1.1);
+  filter: saturate(1.2) brightness(1.1);
+}
+
+/* Kawaii loading states */
+[data-theme="kawaii"] .loading {
+  color: var(--accent-primary);
+}
+
+[data-theme="kawaii"] .loading::after {
+  content: ' 🌸';
+  animation: kawaiiSpin 1s linear infinite;
+}
+
+@keyframes kawaiiSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Kawaii accessibility - respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="kawaii"] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [data-theme="kawaii"] .app::before {
+    animation: none !important;
+  }
+
+  [data-theme="kawaii"] .header::after {
+    animation: none !important;
+  }
+}
+
+/* Kawaii high contrast mode support */
+@media (prefers-contrast: high) {
+  [data-theme="kawaii"] {
+    --text-primary: #4a0e2f;
+    --border-primary: #ff69b4;
+    --accent-primary: #d946ef;
+  }
+}
+
+/* Kawaii mobile optimization */
+@media (max-width: 768px) {
+  [data-theme="kawaii"] .message-content {
+    border-radius: 20px;
+    padding: 12px 16px;
+  }
+
+  [data-theme="kawaii"] .header::after {
+    font-size: 1rem;
+    right: 15px;
+  }
+
+  /* Reduce cloud animations on mobile for performance */
+  [data-theme="kawaii"] .app::before {
+    animation-duration: 30s;
+  }
 }
 
 body {

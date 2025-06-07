@@ -79,6 +79,12 @@ const ThemeToggle = () => {
       name: '💜 Purple',
       description: '@boingo\'s elegant request',
       colors: ['#8b5cf6', '#7c3aed', '#581c87']
+    },
+    {
+      id: 'kawaii',
+      name: '🌸 Kawaii',
+      description: '@bowo\'s cute pastel dream',
+      colors: ['#ffb3d9', '#fff2b3', '#e6ccff']
     }
   ]
 
