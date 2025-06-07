@@ -248,14 +248,12 @@
 @keyframes lumiExpression {
   0%, 100% {
     background-position: 0% 50%;
-    transform: scale(1);
   }
   25% {
     background-position: 100% 0%;
   }
   50% {
     background-position: 100% 50%;
-    transform: scale(1.01);
   }
   75% {
     background-position: 0% 100%;
