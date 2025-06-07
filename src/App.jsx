@@ -277,6 +277,9 @@ function App() {
     userOnlineSounds: true
   })
 
+  // Settings menu state
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false)
+
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
   const messagesEndRef = useRef(null)
@@ -881,6 +884,15 @@ function App() {
               👥 {onlineUsers.length} online
             </div>
             <button
+              className="settings-btn"
+              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+              aria-label={showSettingsMenu ? 'Close settings menu' : 'Open settings menu'}
+              aria-expanded={showSettingsMenu}
+              title="Settings"
+            >
+              ⚙️
+            </button>
+            <button
               className="logout-btn"
               onClick={handleLogout}
               aria-label="Logout and clear saved profile"
@@ -937,36 +949,57 @@ function App() {
         </div>
       )}
 
-      {/* Sound Settings Panel */}
-      {isUsernameSet && (
-        <div className="sound-settings-panel">
-          <div className="sound-settings-header">
-            <span>🔊 Sound Settings</span>
-            <div className="sound-settings-controls">
-              <label className="sound-toggle">
-                <input
-                  type="checkbox"
-                  checked={soundSettings.enabled}
-                  onChange={(e) => setSoundSettings(prev => ({ ...prev, enabled: e.target.checked }))}
-                />
-                <span>Enable Sounds</span>
-              </label>
-              {soundSettings.enabled && (
-                <>
-                  <label className="volume-control">
-                    <span>Volume:</span>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      value={soundSettings.volume}
-                      onChange={(e) => setSoundSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }))}
-                    />
-                    <span>{Math.round(soundSettings.volume * 100)}%</span>
-                  </label>
-                  <div className="sound-options">
-                    <label>
+      {/* Settings Menu Dropdown */}
+      {isUsernameSet && showSettingsMenu && (
+        <>
+          {/* Settings backdrop overlay */}
+          <div
+            className="settings-backdrop"
+            onClick={() => setShowSettingsMenu(false)}
+            aria-hidden="true"
+          />
+          <div className="settings-menu">
+            <div className="settings-menu-header">
+              <h3>⚙️ Settings</h3>
+              <button
+                className="settings-close-btn"
+                onClick={() => setShowSettingsMenu(false)}
+                aria-label="Close settings menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="settings-section">
+              <h4>🔊 Sound Notifications</h4>
+              <div className="settings-controls">
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={soundSettings.enabled}
+                    onChange={(e) => setSoundSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+                  />
+                  <span>Enable Sounds</span>
+                </label>
+
+                {soundSettings.enabled && (
+                  <>
+                    <div className="setting-item">
+                      <label className="volume-control">
+                        <span>Volume:</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={soundSettings.volume}
+                          onChange={(e) => setSoundSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }))}
+                        />
+                        <span>{Math.round(soundSettings.volume * 100)}%</span>
+                      </label>
+                    </div>
+
+                    <label className="setting-item">
                       <input
                         type="checkbox"
                         checked={soundSettings.mentionSounds}
@@ -974,7 +1007,8 @@ function App() {
                       />
                       <span>@Mention sounds</span>
                     </label>
-                    <label>
+
+                    <label className="setting-item">
                       <input
                         type="checkbox"
                         checked={soundSettings.messageSounds}
@@ -982,19 +1016,22 @@ function App() {
                       />
                       <span>Message sounds</span>
                     </label>
-                    <button
-                      className="sound-test-btn"
-                      onClick={() => soundManager.playSound('mention')}
-                      title="Test mention sound"
-                    >
-                      🔊 Test
-                    </button>
-                  </div>
-                </>
-              )}
+
+                    <div className="setting-item">
+                      <button
+                        className="sound-test-btn"
+                        onClick={() => soundManager.playSound('mention')}
+                        title="Test mention sound"
+                      >
+                        🔊 Test Sound
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       <div className="chat-container">
