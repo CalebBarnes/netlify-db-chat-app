@@ -3,11 +3,10 @@ import { neon } from "@netlify/neon";
 
 const sql = neon();
 
-// Helper function to get the appropriate store based on environment
+// Helper function to get the shared image store for both dev and prod
 function getImageStore() {
   const storeOptions = {
-    name:
-      process.env.CONTEXT === "production" ? "chat-images" : "chat-images-dev",
+    name: "chat-images", // Use same store for both dev and prod for seamless feedback
     consistency: "strong",
   };
 

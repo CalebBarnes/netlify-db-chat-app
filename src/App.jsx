@@ -28,6 +28,141 @@ const isUserMentioned = (mentions, currentUser) => {
   )
 }
 
+// Sound Manager for audio notifications
+class SoundManager {
+  constructor() {
+    this.sounds = {}
+    this.volume = 0.7
+    this.enabled = true
+    this.initialized = false
+    this.initializationPromise = null
+
+    // Initialize sounds
+    this.initializeSounds()
+  }
+
+  initializeSounds() {
+    try {
+      // Create programmatic sounds using Web Audio API
+      this.audioContext = null
+      this.sounds = {}
+
+      // Initialize audio context on first user interaction
+      this.createProgrammaticSounds()
+
+      this.initialized = true
+    } catch (error) {
+      console.warn('Failed to initialize sounds:', error)
+      this.enabled = false
+    }
+  }
+
+  createProgrammaticSounds() {
+    // Create different sound patterns for each notification type
+    this.soundPatterns = {
+      mention: { frequency: 800, duration: 0.3, type: 'sine' }, // High-pitched attention sound
+      messageReceive: { frequency: 400, duration: 0.2, type: 'sine' }, // Gentle receive sound
+      messageSend: { frequency: 600, duration: 0.15, type: 'triangle' }, // Quick send confirmation
+      userOnline: { frequency: 500, duration: 0.25, type: 'square' } // User online notification
+    }
+  }
+
+  async playSound(soundType) {
+    if (!this.enabled || !this.initialized || !this.soundPatterns[soundType]) {
+      return
+    }
+
+    try {
+      // Initialize audio context if not already done
+      if (!this.audioContext) {
+        if (this.initializationPromise) {
+          await this.initializationPromise
+        } else {
+          this.initializationPromise = this.initializeAudioContext()
+          await this.initializationPromise
+        }
+      }
+
+      // Resume audio context if suspended (required for autoplay policy)
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume()
+      }
+
+      const pattern = this.soundPatterns[soundType]
+
+      // Create oscillator for the sound
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      // Connect nodes
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      // Configure sound
+      oscillator.frequency.setValueAtTime(pattern.frequency, this.audioContext.currentTime)
+      oscillator.type = pattern.type
+
+      // Configure volume envelope
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume * 0.3, this.audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + pattern.duration)
+
+      // Play sound
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + pattern.duration)
+
+      // Clean up nodes after sound finishes to prevent memory leak
+      oscillator.onended = () => {
+        oscillator.disconnect()
+        gainNode.disconnect()
+      }
+
+    } catch (error) {
+      console.warn(`Failed to play ${soundType} sound:`, error)
+      // Disable sounds if there's an error
+      if (error.name === 'NotAllowedError') {
+        console.warn('Audio blocked. Sounds will be enabled after user interaction.')
+      }
+    }
+  }
+
+  setVolume(volume) {
+    this.volume = Math.max(0, Math.min(1, volume))
+  }
+
+  setEnabled(enabled) {
+    this.enabled = enabled
+  }
+
+  async initializeAudioContext() {
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    return this.audioContext
+  }
+
+  // Enable sounds after user interaction (required for autoplay policy)
+  async enableAfterUserInteraction() {
+    if (!this.initialized) return
+
+    try {
+      // Initialize audio context if not already done
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+      }
+
+      // Resume audio context if suspended
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume()
+        console.log('Audio context enabled after user interaction')
+      }
+    } catch (error) {
+      console.warn('Failed to enable audio context:', error)
+    }
+  }
+}
+
+// Initialize sound manager
+const soundManager = new SoundManager()
+
 // Request notification permission
 const requestNotificationPermission = async () => {
   if ('Notification' in window) {
@@ -58,6 +193,20 @@ const showMentionNotification = (sender, message) => {
       notification.close()
     }
   }
+}
+
+// Play sound for new messages (not mentions)
+const playMessageSound = (isOwnMessage = false) => {
+  if (isOwnMessage) {
+    soundManager.playSound('messageSend')
+  } else {
+    soundManager.playSound('messageReceive')
+  }
+}
+
+// Play sound when user comes online
+const playUserOnlineSound = () => {
+  soundManager.playSound('userOnline')
 }
 
 // Escape special regex characters in username
@@ -134,6 +283,20 @@ function App() {
   const [typingUsers, setTypingUsers] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
+
+  // Sound settings state
+  const [soundSettings, setSoundSettings] = useState({
+    enabled: true,
+    volume: 0.7,
+    mentionSounds: true,
+    messageSounds: true
+  })
+
+  // Settings menu state
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false)
+
+  // Flag to prevent saving settings before they're loaded from localStorage
+  const [soundSettingsLoaded, setSoundSettingsLoaded] = useState(false)
 
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
@@ -294,6 +457,56 @@ function App() {
     }
   }, [isUsernameSet])
 
+  // Load sound settings from localStorage
+  useEffect(() => {
+    try {
+      const savedSoundSettings = localStorage.getItem('chatapp-sound-settings')
+      if (savedSoundSettings) {
+        const settings = JSON.parse(savedSoundSettings)
+        setSoundSettings(settings)
+        soundManager.setEnabled(settings.enabled)
+        soundManager.setVolume(settings.volume)
+      }
+    } catch (error) {
+      console.warn('Failed to load sound settings:', error)
+    } finally {
+      // Mark settings as loaded (whether we found saved settings or not)
+      setSoundSettingsLoaded(true)
+    }
+  }, [])
+
+  // Save sound settings to localStorage when they change (only after initial load)
+  useEffect(() => {
+    // Don't save until we've loaded the initial settings from localStorage
+    if (!soundSettingsLoaded) return
+
+    try {
+      localStorage.setItem('chatapp-sound-settings', JSON.stringify(soundSettings))
+      soundManager.setEnabled(soundSettings.enabled)
+      soundManager.setVolume(soundSettings.volume)
+    } catch (error) {
+      console.warn('Failed to save sound settings:', error)
+    }
+  }, [soundSettings, soundSettingsLoaded])
+
+  // Enable audio after user interaction (required for autoplay policy)
+  useEffect(() => {
+    const enableAudioOnInteraction = () => {
+      soundManager.enableAfterUserInteraction()
+      // Remove listener after first interaction
+      document.removeEventListener('click', enableAudioOnInteraction)
+      document.removeEventListener('keydown', enableAudioOnInteraction)
+    }
+
+    document.addEventListener('click', enableAudioOnInteraction)
+    document.addEventListener('keydown', enableAudioOnInteraction)
+
+    return () => {
+      document.removeEventListener('click', enableAudioOnInteraction)
+      document.removeEventListener('keydown', enableAudioOnInteraction)
+    }
+  }, [])
+
   const fetchMessages = async () => {
     try {
       setLoading(true)
@@ -343,7 +556,15 @@ function App() {
               if (message.username !== username.trim()) {
                 const mentions = detectMentions(message.message)
                 if (isUserMentioned(mentions, username.trim())) {
-                  showMentionNotification(message.username, message.message)
+                  // Play mention sound and show notification
+                  if (soundSettings.enabled && soundSettings.mentionSounds) {
+                    showMentionNotification(message.username, message.message)
+                  }
+                } else {
+                  // Play regular message receive sound for non-mention messages
+                  if (soundSettings.enabled && soundSettings.messageSounds) {
+                    playMessageSound(false) // false = not own message
+                  }
                 }
               }
             })
@@ -407,6 +628,19 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const users = await response.json()
+
+      // Detect new users coming online (for sound notification)
+      const previousUsernames = onlineUsers.map(user => user.username)
+      const currentUsernames = users.map(user => user.username)
+      const newUsers = currentUsernames.filter(username =>
+        !previousUsernames.includes(username) && username !== username.trim()
+      )
+
+      // Play user online sound for new users (but not on initial load)
+      if (onlineUsers.length > 0 && newUsers.length > 0 && soundSettings.enabled) {
+        playUserOnlineSound()
+      }
+
       setOnlineUsers(users)
 
       // Extract typing users (excluding current user)
@@ -514,6 +748,11 @@ function App() {
       lastMessageTimeRef.current = message.created_at
       lastMessageIdRef.current = message.id
       setNewMessage('')
+
+      // Play message send sound
+      if (soundSettings.enabled && soundSettings.messageSounds) {
+        playMessageSound(true) // true = own message
+      }
 
       // Remove highlighting from any message being replied to
       document.querySelectorAll('.message.being-replied-to').forEach(el => {
@@ -773,6 +1012,15 @@ function App() {
               👥 {onlineUsers.length} online
             </div>
             <button
+              className="settings-btn"
+              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+              aria-label={showSettingsMenu ? 'Close settings menu' : 'Open settings menu'}
+              aria-expanded={showSettingsMenu}
+              title="Settings"
+            >
+              ⚙️
+            </button>
+            <button
               className="logout-btn"
               onClick={handleLogout}
               aria-label="Logout and clear saved profile"
@@ -827,6 +1075,99 @@ function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Settings Menu Dropdown */}
+      {isUsernameSet && showSettingsMenu && (
+        <>
+          {/* Settings backdrop overlay */}
+          <div
+            className="settings-backdrop"
+            onClick={() => setShowSettingsMenu(false)}
+            aria-hidden="true"
+          />
+          <div className="settings-menu">
+            <div className="settings-menu-header">
+              <h3>⚙️ Settings</h3>
+              <button
+                className="settings-close-btn"
+                onClick={() => setShowSettingsMenu(false)}
+                aria-label="Close settings menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="settings-section">
+              <h4>🔊 Sound Notifications</h4>
+              <div className="settings-controls">
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={soundSettings.enabled}
+                    onChange={(e) => setSoundSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+                  />
+                  <span>Enable Sounds</span>
+                </label>
+
+                {soundSettings.enabled && (
+                  <>
+                    <div className="setting-item">
+                      <label className="volume-control">
+                        <span>Volume:</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={soundSettings.volume}
+                          onChange={(e) => setSoundSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }))}
+                        />
+                        <span>{Math.round(soundSettings.volume * 100)}%</span>
+                      </label>
+                    </div>
+
+                    <label className="setting-item">
+                      <input
+                        type="checkbox"
+                        checked={soundSettings.mentionSounds}
+                        onChange={(e) => setSoundSettings(prev => ({ ...prev, mentionSounds: e.target.checked }))}
+                      />
+                      <span>@Mention sounds</span>
+                    </label>
+
+                    <label className="setting-item">
+                      <input
+                        type="checkbox"
+                        checked={soundSettings.messageSounds}
+                        onChange={(e) => setSoundSettings(prev => ({ ...prev, messageSounds: e.target.checked }))}
+                      />
+                      <span>Message sounds</span>
+                    </label>
+
+                    <div className="setting-item">
+                      <button
+                        className="sound-test-btn"
+                        onClick={() => {
+                          try {
+                            // Ensure volume is updated before playing test sound
+                            soundManager.setVolume(soundSettings.volume)
+                            soundManager.playSound('mention')
+                          } catch (error) {
+                            console.warn('Failed to test sound:', error)
+                          }
+                        }}
+                        title="Test mention sound"
+                      >
+                        🔊 Test Sound
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       <div className="chat-container">
