@@ -2,24 +2,32 @@ import { getStore } from "@netlify/blobs";
 
 // Helper function to get the appropriate store based on environment
 function getImageStore() {
-  // Use global store for production, deploy store for development/preview
-  if (process.env.CONTEXT === 'production') {
-    return getStore("chat-images");
+  const storeOptions = {
+    name:
+      process.env.CONTEXT === "production" ? "chat-images" : "chat-images-dev",
+    consistency: "strong",
+  };
+
+  // For local development, manually provide siteID and token
+  if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_TOKEN) {
+    storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+    storeOptions.token = process.env.NETLIFY_TOKEN;
   }
-  return getStore("chat-images-dev");
+
+  return getStore(storeOptions);
 }
 
 // Helper function to get content type from filename
 function getContentType(filename) {
-  const extension = filename.split('.').pop().toLowerCase();
+  const extension = filename.split(".").pop().toLowerCase();
   const contentTypes = {
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'png': 'image/png',
-    'webp': 'image/webp',
-    'gif': 'image/gif'
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
   };
-  return contentTypes[extension] || 'application/octet-stream';
+  return contentTypes[extension] || "application/octet-stream";
 }
 
 export const handler = async (event) => {
@@ -48,7 +56,7 @@ export const handler = async (event) => {
 
   try {
     // Extract image key from path
-    const pathParts = event.path.split('/');
+    const pathParts = event.path.split("/");
     const imageKey = pathParts[pathParts.length - 1];
 
     if (!imageKey) {
@@ -61,10 +69,12 @@ export const handler = async (event) => {
 
     // Get the blob store
     const store = getImageStore();
-    
+
     // Retrieve the image from Netlify Blobs
-    const imageData = await store.getWithMetadata(imageKey, { type: 'arrayBuffer' });
-    
+    const imageData = await store.getWithMetadata(imageKey, {
+      type: "arrayBuffer",
+    });
+
     if (!imageData || !imageData.data) {
       return {
         statusCode: 404,
@@ -86,10 +96,9 @@ export const handler = async (event) => {
         "Cache-Control": "public, max-age=31536000", // Cache for 1 year
         "Content-Length": imageData.data.byteLength.toString(),
       },
-      body: Buffer.from(imageData.data).toString('base64'),
+      body: Buffer.from(imageData.data).toString("base64"),
       isBase64Encoded: true,
     };
-
   } catch (error) {
     console.error("Error in images function:", error);
     return {

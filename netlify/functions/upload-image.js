@@ -5,11 +5,19 @@ const sql = neon();
 
 // Helper function to get the appropriate store based on environment
 function getImageStore() {
-  // Use global store for production, deploy store for development/preview
-  if (process.env.CONTEXT === "production") {
-    return getStore("chat-images");
+  const storeOptions = {
+    name:
+      process.env.CONTEXT === "production" ? "chat-images" : "chat-images-dev",
+    consistency: "strong",
+  };
+
+  // For local development, manually provide siteID and token
+  if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_TOKEN) {
+    storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+    storeOptions.token = process.env.NETLIFY_TOKEN;
   }
-  return getStore("chat-images-dev");
+
+  return getStore(storeOptions);
 }
 
 // Helper function to generate unique filename
