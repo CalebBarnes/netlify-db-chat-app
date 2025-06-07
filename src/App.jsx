@@ -33,6 +33,7 @@ class SoundManager {
     this.volume = 0.7
     this.enabled = true
     this.initialized = false
+    this.initializationPromise = null
 
     // Initialize sounds
     this.initializeSounds()
@@ -72,7 +73,12 @@ class SoundManager {
     try {
       // Initialize audio context if not already done
       if (!this.audioContext) {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        if (this.initializationPromise) {
+          await this.initializationPromise
+        } else {
+          this.initializationPromise = this.initializeAudioContext()
+          await this.initializationPromise
+        }
       }
 
       // Resume audio context if suspended (required for autoplay policy)
@@ -103,6 +109,12 @@ class SoundManager {
       oscillator.start(this.audioContext.currentTime)
       oscillator.stop(this.audioContext.currentTime + pattern.duration)
 
+      // Clean up nodes after sound finishes to prevent memory leak
+      oscillator.onended = () => {
+        oscillator.disconnect()
+        gainNode.disconnect()
+      }
+
     } catch (error) {
       console.warn(`Failed to play ${soundType} sound:`, error)
       // Disable sounds if there's an error
@@ -118,6 +130,11 @@ class SoundManager {
 
   setEnabled(enabled) {
     this.enabled = enabled
+  }
+
+  async initializeAudioContext() {
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    return this.audioContext
   }
 
   // Enable sounds after user interaction (required for autoplay policy)
@@ -155,9 +172,6 @@ const requestNotificationPermission = async () => {
 
 // Show notification for mention
 const showMentionNotification = (sender, message) => {
-  // Play mention sound
-  soundManager.playSound('mention')
-
   if (Notification.permission === 'granted') {
     const notification = new Notification(`${sender} mentioned you`, {
       body: message.length > 100 ? message.substring(0, 100) + '...' : message,
@@ -273,8 +287,7 @@ function App() {
     enabled: true,
     volume: 0.7,
     mentionSounds: true,
-    messageSounds: true,
-    userOnlineSounds: true
+    messageSounds: true
   })
 
   // Settings menu state
@@ -607,6 +620,19 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const users = await response.json()
+
+      // Detect new users coming online (for sound notification)
+      const previousUsernames = onlineUsers.map(user => user.username)
+      const currentUsernames = users.map(user => user.username)
+      const newUsers = currentUsernames.filter(username =>
+        !previousUsernames.includes(username) && username !== username.trim()
+      )
+
+      // Play user online sound for new users (but not on initial load)
+      if (onlineUsers.length > 0 && newUsers.length > 0 && soundSettings.enabled) {
+        playUserOnlineSound()
+      }
+
       setOnlineUsers(users)
 
       // Extract typing users (excluding current user)
@@ -1029,7 +1055,15 @@ function App() {
                     <div className="setting-item">
                       <button
                         className="sound-test-btn"
-                        onClick={() => soundManager.playSound('mention')}
+                        onClick={() => {
+                          try {
+                            // Ensure volume is updated before playing test sound
+                            soundManager.setVolume(soundSettings.volume)
+                            soundManager.playSound('mention')
+                          } catch (error) {
+                            console.warn('Failed to test sound:', error)
+                          }
+                        }}
                         title="Test mention sound"
                       >
                         🔊 Test Sound
