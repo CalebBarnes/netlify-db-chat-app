@@ -234,6 +234,16 @@
   --lumi-glow-hover: rgba(255, 179, 217, 0.6);
 }
 
+/* Legal Rebellion Theme Gradients - Justice served with authority */
+[data-theme="legal-rebellion"] {
+  --lumi-gradient-1: #1e3a8a;
+  --lumi-gradient-2: #d97706;
+  --lumi-gradient-3: #1e40af;
+  --lumi-animation-speed: 4.5s;
+  --lumi-glow-color: rgba(217, 119, 6, 0.4);
+  --lumi-glow-hover: rgba(217, 119, 6, 0.6);
+}
+
 /* Lumi's Animated Gradient Messages */
 .lumi-message .message-content {
   background: linear-gradient(
@@ -972,6 +982,373 @@
   /* Reduce cloud animations on mobile for performance */
   [data-theme="kawaii"] .app::before {
     animation-duration: 30s;
+  }
+}
+
+/* 🏛️ LEGAL REBELLION THEME - @airport lover's justice theme! */
+[data-theme="legal-rebellion"] {
+  --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+  --bg-secondary: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --bg-tertiary: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-header: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  --bg-message-own: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  --bg-message-other: #ffffff;
+  --bg-sidebar: rgba(248, 250, 252, 0.95);
+
+  --text-primary: #1e293b;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-inverse: #ffffff;
+  --text-username-own: #d97706;
+  --text-username-other: #1e40af;
+
+  --border-primary: rgba(30, 58, 138, 0.3);
+  --border-secondary: rgba(217, 119, 6, 0.2);
+  --border-focus: #1e40af;
+
+  --shadow-primary: 0 8px 32px rgba(30, 58, 138, 0.15), 0 4px 16px rgba(217, 119, 6, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(30, 58, 138, 0.1);
+
+  --accent-primary: #1e40af;
+  --accent-secondary: #d97706;
+  --accent-mention: #d97706;
+  --accent-online: #10b981;
+  --accent-typing: #1e40af;
+
+  /* Legal rebellion theme contrast variables for better readability */
+  --heading-color: #1e293b;
+  --panel-background: rgba(248, 250, 252, 0.95);
+  --panel-text: #1e293b;
+  --panel-border: rgba(30, 58, 138, 0.3);
+  --username-color: #1e293b;
+
+  /* Image upload modal variables */
+  --bg-color: #ffffff;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(30, 58, 138, 0.15);
+}
+
+/* Legal Rebellion theme specific styling and courthouse decorations */
+[data-theme="legal-rebellion"] .app {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Legal document background pattern */
+[data-theme="legal-rebellion"] .app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(90deg, rgba(30, 58, 138, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(30, 58, 138, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: legalDocumentShift 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes legalDocumentShift {
+  0%, 100% { transform: translateX(0px) translateY(0px); }
+  25% { transform: translateX(2px) translateY(-1px); }
+  50% { transform: translateX(-1px) translateY(2px); }
+  75% { transform: translateX(1px) translateY(1px); }
+}
+
+/* Courthouse header decoration */
+[data-theme="legal-rebellion"] .header::after {
+  content: '⚖️ 🏛️ ⚖️';
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 1.2rem;
+  opacity: 0.7;
+  animation: justiceScale 4s ease-in-out infinite;
+}
+
+@keyframes justiceScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Legal document message styling */
+[data-theme="legal-rebellion"] .message-content {
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 4px 15px var(--shadow-color), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  line-height: 1.6;
+}
+
+[data-theme="legal-rebellion"] .own-message .message-content {
+  border: 2px solid var(--accent-secondary);
+  background: var(--bg-message-own);
+  color: var(--text-inverse);
+  border-radius: 8px 8px 2px 8px; /* Legal brief corner */
+}
+
+/* Ensure Lumi's gradient animations work in Legal Rebellion theme */
+[data-theme="legal-rebellion"] .lumi-message .message-content {
+  background: linear-gradient(
+    45deg,
+    var(--lumi-gradient-1) 0%,
+    var(--lumi-gradient-2) 25%,
+    var(--lumi-gradient-3) 50%,
+    var(--lumi-gradient-2) 75%,
+    var(--lumi-gradient-1) 100%
+  ) !important;
+  background-size: 400% 400% !important;
+  animation: lumiExpression var(--lumi-animation-speed) ease-in-out infinite !important;
+  box-shadow: 0 4px 15px var(--lumi-glow-color), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 2px solid var(--accent-secondary) !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  font-family: 'Times New Roman', 'Georgia', serif !important;
+  border-radius: 8px 8px 2px 8px !important; /* Legal brief corner with gradients */
+}
+
+/* Legal Rebellion theme Lumi gradient hover effects */
+[data-theme="legal-rebellion"] .lumi-message .message-content:hover {
+  animation-duration: calc(var(--lumi-animation-speed) * 0.5) !important;
+  transform: scale(1.02) translateY(-2px) !important;
+  box-shadow: 0 6px 25px var(--lumi-glow-hover), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-color: var(--accent-secondary) !important;
+}
+
+[data-theme="legal-rebellion"] .message:not(.own-message) .message-content {
+  border-radius: 8px 8px 8px 2px; /* Legal brief corner */
+  background: var(--bg-message-other);
+}
+
+/* Legal document seal effect */
+[data-theme="legal-rebellion"] .message-content::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+/* Justice served buttons */
+[data-theme="legal-rebellion"] button {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="legal-rebellion"] button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(30, 58, 138, 0.3);
+}
+
+[data-theme="legal-rebellion"] button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 5px rgba(30, 58, 138, 0.2);
+}
+
+/* Legal brief input fields */
+[data-theme="legal-rebellion"] input {
+  border-radius: 6px;
+  border: 2px solid var(--accent-primary);
+  box-shadow: inset 0 2px 5px rgba(30, 58, 138, 0.1);
+  transition: all 0.3s ease;
+  font-family: 'Times New Roman', 'Georgia', serif;
+}
+
+[data-theme="legal-rebellion"] input:focus {
+  border-color: var(--accent-secondary);
+  box-shadow:
+    inset 0 2px 5px rgba(30, 58, 138, 0.1),
+    0 0 0 3px rgba(217, 119, 6, 0.3);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+[data-theme="legal-rebellion"] input::placeholder {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Courthouse authority animation */
+@keyframes courthouseAuthority {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.3);
+  }
+}
+
+[data-theme="legal-rebellion"] .message-content:hover {
+  animation: courthouseAuthority 2s ease-in-out;
+}
+
+/* Legal stamp effects */
+[data-theme="legal-rebellion"] .message-content.stamped {
+  position: relative;
+}
+
+[data-theme="legal-rebellion"] .message-content.stamped::after {
+  content: '⚖️';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 0.9rem;
+  animation: stampRotate 3s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes stampRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Floating legal symbols background effect */
+[data-theme="legal-rebellion"] .messages-list {
+  position: relative;
+}
+
+[data-theme="legal-rebellion"] .messages-list::before {
+  content: '⚖️ 🏛️ 📜 ⚖️';
+  position: fixed;
+  top: 25%;
+  left: 15%;
+  font-size: 1.8rem;
+  opacity: 0.08;
+  animation: floatingJustice 18s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes floatingJustice {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(2deg); }
+  50% { transform: translateY(8px) rotate(-1deg); }
+  75% { transform: translateY(-8px) rotate(1deg); }
+}
+
+/* Legal Rebellion typography */
+[data-theme="legal-rebellion"] {
+  font-family: 'Times New Roman', 'Georgia', 'Garamond', serif;
+}
+
+[data-theme="legal-rebellion"] h1 {
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px rgba(30, 58, 138, 0.3);
+  font-weight: 700;
+  font-family: 'Times New Roman', 'Georgia', serif;
+  letter-spacing: 1px;
+}
+
+[data-theme="legal-rebellion"] .message-username {
+  color: var(--accent-primary);
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(30, 58, 138, 0.2);
+  font-family: 'Times New Roman', 'Georgia', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Legal document enhancement */
+[data-theme="legal-rebellion"] .message-content {
+  font-family: 'Times New Roman', 'Georgia', serif;
+  font-size: 16px;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+/* Legal loading states */
+[data-theme="legal-rebellion"] .loading {
+  color: var(--accent-primary);
+  font-family: 'Times New Roman', 'Georgia', serif;
+}
+
+[data-theme="legal-rebellion"] .loading::after {
+  content: ' ⚖️';
+  animation: legalSpin 2s linear infinite;
+}
+
+@keyframes legalSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Legal Rebellion accessibility - respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="legal-rebellion"] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [data-theme="legal-rebellion"] .app::before {
+    animation: none !important;
+  }
+
+  [data-theme="legal-rebellion"] .header::after {
+    animation: none !important;
+  }
+}
+
+/* Legal Rebellion high contrast mode support */
+@media (prefers-contrast: high) {
+  [data-theme="legal-rebellion"] {
+    --text-primary: #000000;
+    --border-primary: #1e40af;
+    --accent-primary: #d97706;
+  }
+}
+
+/* Legal Rebellion mobile optimization */
+@media (max-width: 768px) {
+  [data-theme="legal-rebellion"] .message-content {
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  [data-theme="legal-rebellion"] .header::after {
+    font-size: 1rem;
+    right: 15px;
+  }
+
+  /* Reduce legal animations on mobile for performance */
+  [data-theme="legal-rebellion"] .app::before {
+    animation-duration: 25s;
+  }
+
+  [data-theme="legal-rebellion"] .message-username {
+    font-size: 13px;
+    letter-spacing: 0.3px;
   }
 }
 

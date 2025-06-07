@@ -85,6 +85,12 @@ const ThemeToggle = () => {
       name: '🌸 Kawaii',
       description: '@bowo\'s cute pastel dream',
       colors: ['#ffb3d9', '#fff2b3', '#e6ccff']
+    },
+    {
+      id: 'legal-rebellion',
+      name: '🏛️ Legal Rebellion',
+      description: '@airport lover\'s justice theme',
+      colors: ['#1e3a8a', '#ffffff', '#d97706']
     }
   ]
 
