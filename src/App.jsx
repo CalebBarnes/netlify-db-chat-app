@@ -482,6 +482,8 @@ function App() {
       if (event.key === 'Escape') {
         if (showActionsMenu) {
           setShowActionsMenu(false)
+        } else if (showSettingsMenu) {
+          setShowSettingsMenu(false)
         } else if (showSidebar) {
           setShowSidebar(false)
         }
@@ -492,7 +494,7 @@ function App() {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey)
     }
-  }, [showSidebar, showActionsMenu])
+  }, [showSidebar, showActionsMenu, showSettingsMenu])
 
   // Close actions menu when clicking outside
   useEffect(() => {

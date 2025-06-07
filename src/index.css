@@ -1923,14 +1923,14 @@ body {
   background: rgba(102, 126, 234, 0.1) !important; /* Same hover effect */
 }
 
-/* 🚨 CRITICAL FIX: Mark elements styling for mentions */
-mark {
+/* 🚨 CRITICAL FIX: Mark elements styling for mentions - scoped to message content */
+.message-content mark {
   background: transparent !important; /* No background highlight */
   color: #667eea !important; /* Same blue as mentions */
   font-weight: 600 !important; /* Bold for visibility */
 }
 
-.own-message mark {
+.own-message .message-content mark {
   color: #667eea !important; /* Same blue for consistency */
 }
 
