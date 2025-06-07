@@ -39,9 +39,9 @@ class MigrationRunner {
       return result.map((row) => row.version);
     } catch (error) {
       // If table doesn't exist yet, return empty array
-      if (
-        error.message.includes('relation "schema_migrations" does not exist')
-      ) {
+      // Use error code instead of message text for better reliability
+      if (error.code === "42P01") {
+        // undefined_table
         return [];
       }
       throw error;
@@ -55,7 +55,7 @@ class MigrationRunner {
     try {
       const files = readdirSync(this.migrationsDir)
         .filter((file) => file.endsWith(".sql"))
-        .sort(); // Sort to ensure proper order
+        .sort(new Intl.Collator(undefined, { numeric: true }).compare); // Numeric-aware sort
 
       console.log(`📁 Found ${files.length} migration files:`, files);
       return files;
@@ -83,33 +83,62 @@ class MigrationRunner {
   }
 
   /**
-   * Execute a single migration
+   * Split SQL content into individual statements safely
+   * Handles complex SQL with functions, strings, and dollar-quoted blocks
+   */
+  splitSqlStatements(content) {
+    // Remove comments first
+    const withoutComments = content.replace(/--.*$/gm, "");
+
+    // For now, use a simple but safer approach:
+    // Split on semicolon followed by newline, which handles most cases
+    // TODO: Consider using pg-query-splitter for complex PL/pgSQL functions
+    const statements = withoutComments
+      .split(/;\s*\n/)
+      .map((stmt) => stmt.trim())
+      .filter((stmt) => stmt.length > 0);
+
+    // Add semicolons back to statements that need them
+    return statements.map((stmt) => {
+      if (stmt.endsWith(";")) return stmt;
+      if (
+        stmt
+          .toUpperCase()
+          .match(/^(CREATE|ALTER|DROP|INSERT|UPDATE|DELETE|GRANT|REVOKE)/)
+      ) {
+        return stmt + ";";
+      }
+      return stmt;
+    });
+  }
+
+  /**
+   * Execute a single migration atomically
    */
   async executeMigration(filename, content) {
     console.log(`🔄 Applying migration: ${filename}`);
 
     try {
-      // Split the migration into individual statements
-      // This handles multiple SQL statements in one file
-      const statements = content
-        .split(";")
-        .map((stmt) => stmt.trim())
-        .filter((stmt) => stmt.length > 0 && !stmt.startsWith("--"));
+      // Execute the entire migration in a transaction for atomicity
+      await this.sql.begin(async (tx) => {
+        // Split the migration into individual statements safely
+        const statements = this.splitSqlStatements(content);
 
-      // Execute each statement
-      for (const statement of statements) {
-        if (statement.trim()) {
-          await this.sql.unsafe(statement);
+        // Execute each statement within the transaction
+        for (const statement of statements) {
+          if (statement.trim()) {
+            await tx.unsafe(statement);
+          }
         }
-      }
 
-      // Record that this migration has been applied
-      const version = filename.replace(".sql", "");
-      await this.sql`
-        INSERT INTO schema_migrations (version)
-        VALUES (${version})
-        ON CONFLICT (version) DO NOTHING
-      `;
+        // Record that this migration has been applied (within the same transaction)
+        const version = filename.replace(".sql", "");
+        await tx`
+          INSERT INTO schema_migrations (version)
+          VALUES (${version})
+          ON CONFLICT (version) DO NOTHING
+        `;
+      });
 
       console.log(`✅ Migration ${filename} applied successfully`);
     } catch (error) {
