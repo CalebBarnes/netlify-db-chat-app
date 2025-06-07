@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
+// 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
+import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, MessageSquare, BarChart3, Music } from 'lucide-react'
 
-// Configure marked for safe rendering
+// Configure marked for safe rendering with proper line break handling
 marked.setOptions({
   breaks: true, // Convert line breaks to <br>
   gfm: true, // Enable GitHub Flavored Markdown
@@ -13,6 +15,13 @@ marked.setOptions({
   smartLists: true,
   smartypants: false
 })
+
+// Custom renderer to ensure line breaks are properly handled
+const renderer = new marked.Renderer()
+renderer.paragraph = (text) => {
+  // Ensure paragraphs preserve line breaks
+  return `<p>${text}</p>`
+}
 
 // Detect @mentions in message text
 const detectMentions = (message) => {
@@ -163,6 +172,57 @@ class SoundManager {
 // Initialize sound manager
 const soundManager = new SoundManager()
 
+// Discord-style Actions Menu Component (moved outside to prevent re-renders)
+const ActionsMenu = React.memo(({ showActionsMenu, onFileUploadClick }) => {
+  if (!showActionsMenu) return null
+
+  return (
+    <div className="actions-menu">
+      <div className="actions-menu-content">
+        <button
+          type="button"
+          className="action-item"
+          onClick={onFileUploadClick}
+          title="Upload a file"
+        >
+          <Upload size={18} />
+          <span>Upload a File</span>
+        </button>
+
+        <button
+          type="button"
+          className="action-item disabled"
+          title="Create Thread (Coming Soon)"
+          disabled
+        >
+          <MessageSquare size={18} />
+          <span>Create Thread</span>
+        </button>
+
+        <button
+          type="button"
+          className="action-item disabled"
+          title="Create Poll (Coming Soon)"
+          disabled
+        >
+          <BarChart3 size={18} />
+          <span>Create Poll</span>
+        </button>
+
+        <button
+          type="button"
+          className="action-item disabled"
+          title="Use Apps (Coming Soon)"
+          disabled
+        >
+          <Music size={18} />
+          <span>Use Apps</span>
+        </button>
+      </div>
+    </div>
+  )
+})
+
 // Request notification permission
 const requestNotificationPermission = async () => {
   if ('Notification' in window) {
@@ -239,8 +299,12 @@ const renderMarkdown = (text, currentUser = '') => {
       })
     }
 
+    // Manually convert line breaks to ensure they work
+    // Replace single line breaks with double spaces + line break (markdown line break syntax)
+    const textWithLineBreaks = processedText.replace(/\n/g, '  \n')
+
     // Then convert markdown to HTML
-    const html = marked(processedText)
+    const html = marked(textWithLineBreaks)
 
     // Then sanitize the HTML with DOMPurify for comprehensive XSS protection
     return DOMPurify.sanitize(html, {
@@ -305,12 +369,14 @@ function App() {
   const [selectedImage, setSelectedImage] = useState(null)
   const [imageMessage, setImageMessage] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [showActionsMenu, setShowActionsMenu] = useState(false)
   const [lightboxImage, setLightboxImage] = useState(null)
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
   const lastMessageIdRef = useRef(null)
   const typingTimeoutRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -410,11 +476,15 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [isUsernameSet, username])
 
-  // Handle escape key to close sidebar
+  // Handle escape key to close sidebar and actions menu
   useEffect(() => {
     const handleEscapeKey = (event) => {
-      if (event.key === 'Escape' && showSidebar) {
-        setShowSidebar(false)
+      if (event.key === 'Escape') {
+        if (showActionsMenu) {
+          setShowActionsMenu(false)
+        } else if (showSidebar) {
+          setShowSidebar(false)
+        }
       }
     }
 
@@ -422,7 +492,30 @@ function App() {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey)
     }
-  }, [showSidebar])
+  }, [showSidebar, showActionsMenu])
+
+  // Close actions menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showActionsMenu) {
+        const target = event.target
+        const isInsideContainer = target.closest('.actions-button-container')
+        const isInsideMenu = target.closest('.actions-menu')
+        const isFileInput = target.type === 'file'
+
+        // Don't close if clicking inside the container, menu, or file input
+        if (!isInsideContainer && !isInsideMenu && !isFileInput) {
+          setShowActionsMenu(false)
+        }
+      }
+    }
+
+    // Use mousedown instead of click to prevent interference with file input
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showActionsMenu])
 
   // Handle window resize for responsive sidebar behavior
   useEffect(() => {
@@ -784,12 +877,41 @@ function App() {
   const handleMessageInputChange = (e) => {
     setNewMessage(e.target.value)
 
+    // Discord-style auto-resize: only expand if content has line breaks or overflows
+    const textarea = e.target
+    const value = e.target.value
+
+    // Reset to single line height first
+    textarea.style.height = 'auto'
+
+    // Check if we need multiple lines (either line breaks or text overflow)
+    const hasLineBreaks = value.includes('\n')
+    const singleLineHeight = 50 // Base height for single line
+
+    if (hasLineBreaks || textarea.scrollHeight > singleLineHeight) {
+      // Expand to fit content, but cap at max height
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px'
+    } else {
+      // Keep single line height
+      textarea.style.height = singleLineHeight + 'px'
+    }
+
     // Trigger typing indicator when user starts typing
     if (e.target.value.trim().length > 0) {
       handleTypingStart()
     } else if (isTyping) {
       handleTypingStop()
     }
+  }
+
+  // Handle Discord-style keyboard shortcuts
+  const handleKeyDown = (e) => {
+    // Enter without Shift = send message
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage(e)
+    }
+    // Shift+Enter = line break (default textarea behavior, no need to handle)
   }
 
   const handleLogout = () => {
@@ -864,11 +986,33 @@ function App() {
     }
   }
 
+  // Discord-style actions menu handlers
+  const toggleActionsMenu = () => {
+    setShowActionsMenu(!showActionsMenu)
+  }
+
+  const closeActionsMenu = () => {
+    setShowActionsMenu(false)
+  }
+
   // Image upload handlers
   const handleImageSelect = (file) => {
     setSelectedImage(file)
     setImageMessage('')
+    setShowActionsMenu(false) // Close menu after selecting file
   }
+
+  // Handle file upload from actions menu
+  const handleFileUploadClick = useCallback(() => {
+    // Close the menu first to prevent flashing
+    setShowActionsMenu(false)
+    // Small delay to ensure menu is closed before triggering file input
+    setTimeout(() => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click()
+      }
+    }, 100)
+  }, [])
 
   const handleImageCancel = () => {
     setSelectedImage(null)
@@ -1007,9 +1151,9 @@ function App() {
             <p>Welcome, <strong>{username}</strong>! ✨ Bringing warm light to your conversations</p>
           </div>
           <div className="header-right">
-            <ThemeToggle />
+            {/* <ThemeToggle /> - Temporarily hidden since we only have Lumi Brand theme */}
             <div className="user-count">
-              👥 {onlineUsers.length} online
+              <Users size={16} /> {onlineUsers.length} online
             </div>
             <button
               className="settings-btn"
@@ -1018,7 +1162,7 @@ function App() {
               aria-expanded={showSettingsMenu}
               title="Settings"
             >
-              ⚙️
+              <Settings size={18} />
             </button>
             <button
               className="logout-btn"
@@ -1026,7 +1170,7 @@ function App() {
               aria-label="Logout and clear saved profile"
               title="Logout"
             >
-              🚪
+              <LogOut size={18} />
             </button>
             <button
               className="sidebar-toggle"
@@ -1034,7 +1178,7 @@ function App() {
               aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
               aria-expanded={showSidebar}
             >
-              👥
+              <Users size={18} />
             </button>
           </div>
         </div>
@@ -1088,7 +1232,7 @@ function App() {
           />
           <div className="settings-menu">
             <div className="settings-menu-header">
-              <h3>⚙️ Settings</h3>
+              <h3><Settings size={18} /> Settings</h3>
               <button
                 className="settings-close-btn"
                 onClick={() => setShowSettingsMenu(false)}
@@ -1183,7 +1327,7 @@ function App() {
                 <div
                   key={message.id}
                   data-message-id={message.id}
-                  className={`message ${message.username === username ? 'own-message' : ''} ${message.username === 'Lumi' ? 'lumi-message' : ''}`}
+                  className={`message ${message.username === username ? 'own-message' : ''}`}
                 >
                   {/* Show compact reply reference if this is a reply - Discord style */}
                   {message.reply_to_id && (
@@ -1209,7 +1353,7 @@ function App() {
                       title={`Reply to ${message.username}`}
                       aria-label={`Reply to ${message.username}'s message`}
                     >
-                      ↩️
+                      <Reply size={14} />
                     </button>
                   </div>
                   <div
@@ -1252,7 +1396,7 @@ function App() {
             />
             <div className="sidebar">
               <div className="sidebar-header">
-                <h3>👥 Online Users</h3>
+                <h3><Users size={18} /> Online Users</h3>
                 <div className="sidebar-header-actions">
                   <span className="user-count-badge">{onlineUsers.length}</span>
                   <button
@@ -1308,14 +1452,65 @@ function App() {
               aria-label="Cancel reply"
               title="Cancel reply"
             >
-              ✕
+              <X size={14} />
             </button>
           </div>
         )}
 
-        {/* Typing indicators - dedicated space with no layout shift */}
+        <div className="input-group">
+          {/* Discord-style + button with actions menu */}
+          <div className="actions-button-container">
+            <button
+              type="button"
+              className={`actions-button ${showActionsMenu ? 'active' : ''}`}
+              onClick={toggleActionsMenu}
+              disabled={submitting || uploadingImage}
+              aria-label="Open actions menu"
+              title="Upload files and more"
+            >
+              <Plus size={20} />
+            </button>
+            <ActionsMenu
+              showActionsMenu={showActionsMenu}
+              onFileUploadClick={handleFileUploadClick}
+            />
+            {/* Hidden file input for upload functionality */}
+            <ImageUpload
+              ref={fileInputRef}
+              onImageSelect={handleImageSelect}
+              disabled={submitting || uploadingImage}
+            />
+          </div>
+          <textarea
+            ref={messageInputRef}
+            className="message-input"
+            placeholder="Type your message... (Shift+Enter for line breaks)"
+            value={newMessage}
+            onChange={handleMessageInputChange}
+            onKeyDown={handleKeyDown}
+            disabled={submitting}
+            maxLength={1000}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            rows={1}
+            style={{ resize: 'none', overflow: 'hidden' }}
+          />
+          <button
+            type="submit"
+            className="send-btn"
+            disabled={submitting || uploadingImage || !newMessage.trim()}
+            aria-label={submitting ? 'Sending message...' : 'Send message'}
+            title={submitting ? 'Sending...' : 'Send'}
+          >
+            {submitting ? '⏳' : <Send size={16} />}
+          </button>
+        </div>
+
+        {/* Discord-style typing indicator below input */}
         <div
-          className={`typing-indicator-dedicated ${typingUsers.length > 0 ? 'visible' : 'hidden'}`}
+          className={`typing-indicator-below ${typingUsers.length > 0 ? 'visible' : 'hidden'}`}
           aria-live="polite"
           role="status"
         >
@@ -1336,37 +1531,6 @@ function App() {
               }
             </span>
           </div>
-        </div>
-
-        <div className="input-group">
-          <ImageUpload
-            onImageSelect={handleImageSelect}
-            disabled={submitting || uploadingImage}
-          />
-          <input
-            ref={messageInputRef}
-            type="text"
-            className="message-input"
-            placeholder="Type your message..."
-            value={newMessage}
-            onChange={handleMessageInputChange}
-            disabled={submitting}
-            maxLength={1000}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            inputMode="text"
-          />
-          <button
-            type="submit"
-            className="send-btn"
-            disabled={submitting || uploadingImage || !newMessage.trim()}
-            aria-label={submitting ? 'Sending message...' : 'Send message'}
-            title={submitting ? 'Sending...' : 'Send'}
-          >
-            {submitting ? '⏳' : '➤'}
-          </button>
         </div>
       </form>
 
