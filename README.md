@@ -103,13 +103,14 @@ A modern, real-time chat application with comprehensive features, built with Rea
 │   └── functions/
 │       ├── messages.js      # Chat messages API with reply support
 │       ├── presence.js      # User presence & typing indicators
-│       ├── todos.js         # Legacy todo API
+│       ├── upload-image.js  # Image upload functionality
 │       └── messages-stream.js # Real-time streaming (experimental)
 ├── migrations/
-│   ├── 001_create_todos_table.sql
 │   ├── 002_create_messages_table.sql
 │   ├── 003_add_typing_indicators.sql
-│   └── 004_add_reply_functionality.sql
+│   ├── 004_add_reply_functionality.sql
+│   ├── 005_add_image_support.sql
+│   └── 006_drop_todos_table.sql
 ├── scripts/
 │   ├── migrate.js           # Migration runner
 │   └── clear-messages.js    # Utility to clear chat history
