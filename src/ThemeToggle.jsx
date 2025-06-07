@@ -73,6 +73,12 @@ const ThemeToggle = () => {
       name: '🌊 Ocean',
       description: 'Cool blue vibes',
       colors: ['#667eea', '#0ea5e9', '#0284c7']
+    },
+    {
+      id: 'purple',
+      name: '💜 Purple',
+      description: '@boingo\'s elegant request',
+      colors: ['#8b5cf6', '#7c3aed', '#581c87']
     }
   ]
 
@@ -99,7 +105,6 @@ const ThemeToggle = () => {
       <div className={`theme-dropdown ${isDropdownOpen ? 'show' : ''}`}>
         <div className="theme-dropdown-header">
           <h4>🎨 Choose Theme</h4>
-          <p>Addresses Issues #4, #22, #27</p>
         </div>
 
         {themes.map((themeOption) => (
