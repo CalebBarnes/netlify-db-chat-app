@@ -280,6 +280,9 @@ function App() {
   // Settings menu state
   const [showSettingsMenu, setShowSettingsMenu] = useState(false)
 
+  // Flag to prevent saving settings before they're loaded from localStorage
+  const [soundSettingsLoaded, setSoundSettingsLoaded] = useState(false)
+
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
   const messagesEndRef = useRef(null)
@@ -445,11 +448,17 @@ function App() {
       }
     } catch (error) {
       console.warn('Failed to load sound settings:', error)
+    } finally {
+      // Mark settings as loaded (whether we found saved settings or not)
+      setSoundSettingsLoaded(true)
     }
   }, [])
 
-  // Save sound settings to localStorage when they change
+  // Save sound settings to localStorage when they change (only after initial load)
   useEffect(() => {
+    // Don't save until we've loaded the initial settings from localStorage
+    if (!soundSettingsLoaded) return
+
     try {
       localStorage.setItem('chatapp-sound-settings', JSON.stringify(soundSettings))
       soundManager.setEnabled(soundSettings.enabled)
@@ -457,7 +466,7 @@ function App() {
     } catch (error) {
       console.warn('Failed to save sound settings:', error)
     }
-  }, [soundSettings])
+  }, [soundSettings, soundSettingsLoaded])
 
   // Enable audio after user interaction (required for autoplay policy)
   useEffect(() => {
