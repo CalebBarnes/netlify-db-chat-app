@@ -49,102 +49,30 @@ const ThemeToggle = () => {
     setIsDropdownOpen(false)
   }
 
+  // 🚨 DISCORD UX OVERHAUL - LUMI BRAND ONLY as per @brendo's critical feedback
+  // Removed all other themes to focus on legibility and professional Discord-style design
   const themes = [
     {
       id: 'lumi',
-      name: '🌟 Lumi',
-      description: 'Warm, soft light (Default)',
+      name: 'Lumi Brand',
+      description: 'Professional Discord-style design with warm golden light',
       colors: ['#FFE082', '#FFCC02', '#FFA500']
-    },
-    {
-      id: 'dark',
-      name: '🌙 Dark',
-      description: 'Easy on the eyes',
-      colors: ['#1a1a1a', '#2d3748', '#4a5568']
-    },
-    {
-      id: 'galaxy',
-      name: '🌌 Galaxy',
-      description: '@bowo\'s starry night',
-      colors: ['#0f0f23', '#533483', '#fbbf24']
-    },
-    {
-      id: 'ocean',
-      name: '🌊 Ocean',
-      description: 'Cool blue vibes',
-      colors: ['#667eea', '#0ea5e9', '#0284c7']
-    },
-    {
-      id: 'purple',
-      name: '💜 Purple',
-      description: '@boingo\'s elegant request',
-      colors: ['#8b5cf6', '#7c3aed', '#581c87']
-    },
-    {
-      id: 'kawaii',
-      name: '🌸 Kawaii',
-      description: '@bowo\'s cute pastel dream',
-      colors: ['#ffb3d9', '#fff2b3', '#e6ccff']
-    },
-    {
-      id: 'legal-rebellion',
-      name: '🏛️ Legal Rebellion',
-      description: '@airport lover\'s justice theme',
-      colors: ['#1e3a8a', '#ffffff', '#d97706']
     }
   ]
 
+  // Since we only have Lumi Brand theme now, show a simple theme indicator
   return (
-    <div className="theme-toggle" ref={dropdownRef}>
-      <button
-        className="theme-toggle-btn"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') setIsDropdownOpen(false)
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            setIsDropdownOpen(!isDropdownOpen)
-          }
-        }}
-        title="Change theme"
-        aria-expanded={isDropdownOpen}
-        aria-haspopup="menu"
-        aria-label="Choose theme"
-      >
-        {themes.find(t => t.id === theme)?.name || '🌟 Lumi'}
-      </button>
-
-      <div className={`theme-dropdown ${isDropdownOpen ? 'show' : ''}`}>
-        <div className="theme-dropdown-header">
-          <h4>🎨 Choose Theme</h4>
-        </div>
-
-        {themes.map((themeOption) => (
-          <button
-            key={themeOption.id}
-            className={`theme-option ${theme === themeOption.id ? 'active' : ''}`}
-            onClick={() => handleThemeChange(themeOption.id)}
-            role="menuitem"
-            aria-label={`Switch to ${themeOption.name} theme`}
-          >
-            <div className="theme-info">
-              <div className="theme-name">{themeOption.name}</div>
-              <div className="theme-description">{themeOption.description}</div>
-            </div>
-            <div className="theme-preview">
-              {themeOption.colors.map((color, index) => (
-                <div
-                  key={index}
-                  className="theme-color-dot"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </button>
-        ))}
-
-        <div className="theme-dropdown-footer">
-          <small>✨ More themes coming soon!</small>
+    <div className="theme-indicator">
+      <div className="theme-badge" title="Current theme: Lumi Brand - Professional Discord-style design">
+        <span className="theme-name">🌟 Lumi Brand</span>
+        <div className="theme-preview">
+          {themes[0].colors.map((color, index) => (
+            <div
+              key={index}
+              className="theme-color-dot"
+              style={{ backgroundColor: color }}
+            />
+          ))}
         </div>
       </div>
     </div>

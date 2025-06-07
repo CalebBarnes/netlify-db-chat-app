@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, forwardRef } from 'react'
 
-const ImageUpload = ({ onImageSelect, disabled = false }) => {
+const ImageUpload = forwardRef(({ onImageSelect, disabled = false }, ref) => {
   const [dragOver, setDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const fileInputRef = useRef(null)
+  const fileInputRef = ref || useRef(null)
 
   const handleFileSelect = (file) => {
     if (!file) return
@@ -82,6 +82,8 @@ const ImageUpload = ({ onImageSelect, disabled = false }) => {
       </button>
     </>
   )
-}
+})
+
+ImageUpload.displayName = 'ImageUpload'
 
 export default ImageUpload
