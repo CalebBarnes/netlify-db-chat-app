@@ -961,8 +961,8 @@ function App() {
     return (
       <div className="app">
         <div className="header">
-          <h1>💬 Chat App</h1>
-          <p>Powered by Netlify DB</p>
+          <h1>🌟 Lumi Chat</h1>
+          <p>Warm, soft light for coding and friendship</p>
         </div>
 
         <form className="username-form" onSubmit={handleUsernameSubmit}>
@@ -1003,8 +1003,8 @@ function App() {
       <div className="header">
         <div className="header-content">
           <div className="header-left">
-            <h1>💬 Chat App</h1>
-            <p>Welcome, <strong>{username}</strong>!</p>
+            <h1>🌟 Lumi Chat</h1>
+            <p>Welcome, <strong>{username}</strong>! ✨ Bringing warm light to your conversations</p>
           </div>
           <div className="header-right">
             <ThemeToggle />
@@ -1175,8 +1175,8 @@ function App() {
           <div className="messages-list">
             {messages.length === 0 ? (
               <div className="empty-state">
-                <h3>No messages yet!</h3>
-                <p>Be the first to say hello! 👋</p>
+                <h3>✨ Welcome to Lumi Chat!</h3>
+                <p>Share your thoughts and let the warm light of conversation begin! 🌟</p>
               </div>
             ) : (
               messages.map(message => (

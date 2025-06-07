@@ -66,6 +66,102 @@
   --shadow-color: rgba(255, 193, 7, 0.15);
 }
 
+/* 🌟 LUMI BRAND THEME - Warm, soft light for coding and friendship! */
+[data-theme="lumi"] {
+  --bg-primary: linear-gradient(135deg, #FFE082 0%, #FFCC02 50%, #FFA500 100%);
+  --bg-secondary: linear-gradient(145deg, #FFFDE7 0%, #FFF8E1 100%);
+  --bg-tertiary: #FFF8E1;
+  --bg-input: #FFFFFF;
+  --bg-header: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+  --bg-message-own: linear-gradient(135deg, #FFCC02 0%, #FF9800 100%);
+  --bg-message-other: #FFFFFF;
+  --bg-sidebar: rgba(255, 248, 225, 0.95);
+
+  --text-primary: #3E2723;
+  --text-secondary: #5D4037;
+  --text-tertiary: #8D6E63;
+  --text-inverse: #FFFFFF;
+  --text-username-own: #E65100;
+  --text-username-other: #FF6F00;
+
+  --border-primary: rgba(255, 193, 7, 0.3);
+  --border-secondary: rgba(255, 152, 0, 0.2);
+  --border-focus: #FF9800;
+
+  --shadow-primary: 0 8px 32px rgba(255, 193, 7, 0.15), 0 4px 16px rgba(255, 152, 0, 0.1);
+  --shadow-secondary: 0 4px 16px rgba(255, 193, 7, 0.1);
+
+  --accent-primary: #FF9800;
+  --accent-secondary: #FFB74D;
+  --accent-mention: #FFC107;
+  --accent-online: #4CAF50;
+  --accent-typing: #FF9800;
+
+  /* Theme contrast variables for better readability */
+  --heading-color: #3E2723;
+  --panel-background: #FFFFFF;
+  --panel-text: #333333;
+  --panel-border: #e1e5e9;
+  --username-color: #333333;
+
+  /* Image upload modal variables */
+  --bg-color: #FFFFFF;
+  --header-bg: var(--bg-header);
+  --text-color: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --border-color: var(--border-primary);
+  --input-bg: var(--bg-input);
+  --message-bg: var(--bg-message-other);
+  --hover-bg: var(--bg-tertiary);
+  --button-bg: var(--bg-header);
+  --button-text: var(--text-inverse);
+  --button-border: var(--border-primary);
+  --button-hover-bg: var(--accent-secondary);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--accent-secondary);
+  --accent-color: var(--accent-primary);
+  --accent-hover: var(--accent-secondary);
+  --shadow-color: rgba(255, 193, 7, 0.15);
+}
+
+/* Lumi theme specific enhancements for brand identity */
+[data-theme="lumi"] .message-content {
+  color: #3E2723 !important; /* Warm brown text for excellent readability */
+}
+
+[data-theme="lumi"] .message:not(.own-message) .message-content {
+  color: #3E2723 !important; /* Consistent warm text on white message bubbles */
+}
+
+/* Lumi's own messages get the warm golden glow */
+[data-theme="lumi"] .message.own-message .message-content {
+  color: #FFFFFF !important; /* White text on golden background for Lumi's warmth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for readability */
+}
+
+[data-theme="lumi"] .theme-name,
+[data-theme="lumi"] .theme-description {
+  color: #3E2723 !important; /* High contrast for theme dropdown text */
+}
+
+/* Special Lumi brand animations and effects */
+[data-theme="lumi"] .header::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 193, 7, 0.2), transparent);
+  animation: lumiGlow 4s ease-in-out infinite;
+}
+
+@keyframes lumiGlow {
+  0%, 100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+
 /* Galaxy theme specific text contrast improvements */
 [data-theme="galaxy"] .message-content {
   color: #ffffff !important; /* Starry white text for all messages */
