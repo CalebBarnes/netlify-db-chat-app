@@ -5,7 +5,7 @@ import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
-import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, MessageSquare, BarChart3, Music } from 'lucide-react'
+import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload } from 'lucide-react'
 
 // Configure marked for safe rendering with proper line break handling
 marked.setOptions({
@@ -187,36 +187,6 @@ const ActionsMenu = React.memo(({ showActionsMenu, onFileUploadClick }) => {
         >
           <Upload size={18} />
           <span>Upload a File</span>
-        </button>
-
-        <button
-          type="button"
-          className="action-item disabled"
-          title="Create Thread (Coming Soon)"
-          disabled
-        >
-          <MessageSquare size={18} />
-          <span>Create Thread</span>
-        </button>
-
-        <button
-          type="button"
-          className="action-item disabled"
-          title="Create Poll (Coming Soon)"
-          disabled
-        >
-          <BarChart3 size={18} />
-          <span>Create Poll</span>
-        </button>
-
-        <button
-          type="button"
-          className="action-item disabled"
-          title="Use Apps (Coming Soon)"
-          disabled
-        >
-          <Music size={18} />
-          <span>Use Apps</span>
         </button>
       </div>
     </div>
