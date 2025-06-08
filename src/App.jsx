@@ -5,7 +5,7 @@ import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
-import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github } from 'lucide-react'
+import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github, ChevronDown, User } from 'lucide-react'
 
 // Configure marked for safe rendering with proper line break handling
 marked.setOptions({
@@ -256,6 +256,56 @@ const MentionsAutocomplete = React.memo(({
   )
 })
 
+// User Menu Component (combines Settings + Logout)
+const UserMenu = React.memo(({
+  show,
+  username,
+  onSettingsClick,
+  onLogoutClick,
+  onClose
+}) => {
+  if (!show) return null
+
+  return (
+    <>
+      {/* Backdrop overlay */}
+      <div
+        className="user-menu-backdrop"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="user-menu">
+        <div className="user-menu-header">
+          <div className="user-avatar">
+            <User size={20} />
+          </div>
+          <div className="user-info">
+            <div className="user-name">{username}</div>
+            <div className="user-status">Online</div>
+          </div>
+        </div>
+        <div className="user-menu-divider" />
+        <div className="user-menu-actions">
+          <button
+            className="user-menu-item"
+            onClick={onSettingsClick}
+          >
+            <Settings size={16} />
+            <span>Settings</span>
+          </button>
+          <button
+            className="user-menu-item logout"
+            onClick={onLogoutClick}
+          >
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </>
+  )
+})
+
 // Request notification permission
 const requestNotificationPermission = async () => {
   if ('Notification' in window) {
@@ -392,6 +442,9 @@ function App() {
 
   // Settings menu state
   const [showSettingsMenu, setShowSettingsMenu] = useState(false)
+
+  // User dropdown menu state (combines settings + logout)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   // Flag to prevent saving settings before they're loaded from localStorage
   const [soundSettingsLoaded, setSoundSettingsLoaded] = useState(false)
@@ -543,7 +596,7 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [isUsernameSet, username])
 
-  // Handle escape key to close sidebar and actions menu
+  // Handle escape key to close sidebar, actions menu, and user menu
   useEffect(() => {
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
@@ -551,6 +604,8 @@ function App() {
           setShowActionsMenu(false)
         } else if (showSettingsMenu) {
           setShowSettingsMenu(false)
+        } else if (showUserMenu) {
+          setShowUserMenu(false)
         } else if (showSidebar) {
           setShowSidebar(false)
         }
@@ -561,7 +616,7 @@ function App() {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey)
     }
-  }, [showSidebar, showActionsMenu, showSettingsMenu])
+  }, [showSidebar, showActionsMenu, showSettingsMenu, showUserMenu])
 
   // Close actions menu when clicking outside
   useEffect(() => {
@@ -1316,53 +1371,60 @@ function App() {
             <p>Welcome, <strong>{username}</strong>! ✨ Bringing warm light to your conversations</p>
           </div>
           <div className="header-right">
-            {/* <ThemeToggle /> - Temporarily hidden since we only have Lumi Brand theme */}
-            <div className="user-count">
-              <Users size={16} /> {onlineUsers.length} online
-            </div>
+            {/* Primary actions - GitHub link */}
+            <a
+              href="https://github.com/CalebBarnes/netlify-db-chat-app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="github-link"
+              aria-label="View source code on GitHub"
+              title="View source code on GitHub"
+            >
+              <Github size={18} />
+            </a>
 
-            {/* Primary actions group */}
-            <div className="header-actions-primary">
-              <a
-                href="https://github.com/CalebBarnes/netlify-db-chat-app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="github-link"
-                aria-label="View source code on GitHub"
-                title="View source code on GitHub"
-              >
-                <Github size={18} />
-              </a>
-              <button
-                className="sidebar-toggle"
-                onClick={() => setShowSidebar(!showSidebar)}
-                aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
-                aria-expanded={showSidebar}
-                title="Online Users"
-              >
-                <Users size={18} />
-              </button>
-            </div>
+            {/* Sidebar toggle with user count in tooltip */}
+            <button
+              className="sidebar-toggle"
+              onClick={() => setShowSidebar(!showSidebar)}
+              aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
+              aria-expanded={showSidebar}
+              title={`${onlineUsers.length} users online`}
+            >
+              <Users size={18} />
+            </button>
 
-            {/* Secondary actions group */}
-            <div className="header-actions-secondary">
+            {/* User avatar dropdown (combines Settings + Logout) */}
+            <div className="user-avatar-container">
               <button
-                className="settings-btn"
-                onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                aria-label={showSettingsMenu ? 'Close settings menu' : 'Open settings menu'}
-                aria-expanded={showSettingsMenu}
-                title="Settings"
+                className="user-avatar-button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                aria-label="Open user menu"
+                aria-expanded={showUserMenu}
+                title={`${username} - User menu`}
               >
-                <Settings size={18} />
+                <div className="user-avatar">
+                  <User size={18} />
+                </div>
+                <ChevronDown size={14} className="dropdown-arrow" />
               </button>
-              <button
-                className="logout-btn"
-                onClick={handleLogout}
-                aria-label="Logout and clear saved profile"
-                title="Logout"
-              >
-                <LogOut size={18} />
-              </button>
+
+              {/* User Menu Dropdown - positioned relative to button */}
+              {isUsernameSet && (
+                <UserMenu
+                  show={showUserMenu}
+                  username={username}
+                  onSettingsClick={() => {
+                    setShowUserMenu(false)
+                    setShowSettingsMenu(true)
+                  }}
+                  onLogoutClick={() => {
+                    setShowUserMenu(false)
+                    handleLogout()
+                  }}
+                  onClose={() => setShowUserMenu(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -1404,6 +1466,8 @@ function App() {
           </div>
         </div>
       )}
+
+
 
       {/* Settings Menu Dropdown */}
       {isUsernameSet && showSettingsMenu && (
