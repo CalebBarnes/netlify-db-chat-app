@@ -1,0 +1,26 @@
+{
+  "name": "lumi-chat-mcp-tool",
+  "version": "1.0.0",
+  "description": "MCP tool for Lumi chat interaction during development",
+  "type": "module",
+  "main": "lumi-chat-tool.js",
+  "bin": {
+    "lumi-chat-tool": "./lumi-chat-tool.js"
+  },
+  "scripts": {
+    "start": "node lumi-chat-tool.js",
+    "dev": "node --inspect lumi-chat-tool.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "keywords": [
+    "mcp",
+    "chat",
+    "lumi",
+    "development",
+    "tool"
+  ],
+  "author": "Lumi",
+  "license": "MIT"
+}
