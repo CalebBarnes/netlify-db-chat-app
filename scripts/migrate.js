@@ -90,26 +90,53 @@ class MigrationRunner {
     // Remove comments first
     const withoutComments = content.replace(/--.*$/gm, "");
 
-    // For now, use a simple but safer approach:
-    // Split on semicolon followed by newline, which handles most cases
-    // TODO: Consider using pg-query-splitter for complex PL/pgSQL functions
-    const statements = withoutComments
-      .split(/;\s*\n/)
-      .map((stmt) => stmt.trim())
-      .filter((stmt) => stmt.length > 0);
+    const statements = [];
+    let currentStatement = "";
+    let inDollarQuote = false;
+    let dollarTag = "";
 
-    // Add semicolons back to statements that need them
-    return statements.map((stmt) => {
-      if (stmt.endsWith(";")) return stmt;
-      if (
-        stmt
-          .toUpperCase()
-          .match(/^(CREATE|ALTER|DROP|INSERT|UPDATE|DELETE|GRANT|REVOKE)/)
-      ) {
-        return stmt + ";";
+    const lines = withoutComments.split("\n");
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+
+      // Check for dollar-quoted strings (PostgreSQL functions)
+      if (!inDollarQuote) {
+        const dollarMatch = trimmedLine.match(/\$([^$]*)\$/);
+        if (dollarMatch) {
+          inDollarQuote = true;
+          dollarTag = dollarMatch[0];
+        }
+      } else {
+        // Check if we're ending the dollar quote
+        if (
+          trimmedLine.includes(dollarTag) &&
+          trimmedLine.indexOf(dollarTag) > 0
+        ) {
+          inDollarQuote = false;
+          dollarTag = "";
+        }
       }
-      return stmt;
-    });
+
+      currentStatement += line + "\n";
+
+      // Only split on semicolon if we're not inside a dollar-quoted block
+      if (!inDollarQuote && trimmedLine.endsWith(";")) {
+        const stmt = currentStatement.trim();
+        if (stmt.length > 0) {
+          statements.push(stmt);
+        }
+        currentStatement = "";
+      }
+    }
+
+    // Add any remaining statement
+    const finalStmt = currentStatement.trim();
+    if (finalStmt.length > 0) {
+      statements.push(finalStmt.endsWith(";") ? finalStmt : finalStmt + ";");
+    }
+
+    return statements.filter((stmt) => stmt.length > 0);
   }
 
   /**
@@ -134,8 +161,9 @@ class MigrationRunner {
             }: ${statement.substring(0, 50)}...`
           );
           try {
-            // Execute raw SQL using template literal syntax
-            // Use unsafe() for dynamic SQL execution with proper error handling
+            // Execute raw SQL using Neon's tagged template literal
+            // For dynamic SQL, we need to use the unsafe method or construct properly
+            // Since Neon doesn't have unsafe(), we'll use a workaround
             await this.sql.unsafe(statement);
             console.log(`   ✅ Statement ${i + 1} executed successfully`);
           } catch (stmtError) {
