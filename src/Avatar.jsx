@@ -74,8 +74,9 @@ const Avatar = ({
   ].filter(Boolean).join(' ')
 
   if (loading) {
+    // Use the same avatarStyle as other states to ensure consistent sizing
     return (
-      <div 
+      <div
         className={`${containerClasses} loading`}
         style={avatarStyle}
         title="Loading avatar..."

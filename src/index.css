@@ -666,6 +666,11 @@ body {
   border-color: var(--border-focus); /* Highlight border on hover */
 }
 
+.sidebar-toggle:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 .sidebar-toggle:active {
   transform: translateY(0);
 }
@@ -2431,6 +2436,11 @@ body {
   border-color: var(--border-focus); /* Highlight border on hover */
 }
 
+.github-link:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 .github-link:active {
   transform: translateY(0);
 }
@@ -2842,12 +2852,27 @@ body {
 
 /* Header avatar - no border for cleaner look */
 .header-avatar.avatar-container {
-  border: none;
+  border: none !important;
 }
 
-/* Header avatar loading state - also no border */
+/* Header avatar loading state - also no border and smaller spinner */
 .header-avatar.avatar-container.loading {
-  border: none;
+  border: none !important;
+  background: transparent !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+}
+
+/* Header avatar loading spinner - smaller and no border */
+.header-avatar .avatar-loading-spinner {
+  width: 16px !important;
+  height: 16px !important;
+  border: 1px solid var(--border-primary) !important;
+  border-top: 1px solid var(--accent-primary) !important;
 }
 
 .avatar-container.clickable {
@@ -2879,21 +2904,39 @@ body {
   font-family: var(--font-family);
 }
 
-/* Avatar Loading */
-.avatar-container.loading {
-  background: var(--bg-tertiary);
+/* Avatar Loading - Force small size for ALL avatars - Override general .loading class */
+.avatar-container.loading,
+.message-avatar.avatar-container.loading,
+.header-avatar.avatar-container.loading {
+  background: var(--bg-tertiary) !important;
+  border: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  padding: 0 !important; /* Override general .loading padding */
+  text-align: center !important; /* Override general .loading text-align */
+  font-size: inherit !important; /* Override general .loading font-size */
+  color: inherit !important; /* Override general .loading color */
 }
 
 .avatar-loading-spinner {
-  width: 60%;
-  height: 60%;
-  border: 2px solid var(--border-primary);
-  border-top: 2px solid var(--accent-primary);
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border-primary);
+  border-top: 1px solid var(--accent-primary);
   border-radius: 50%;
   animation: avatarSpin 1s linear infinite;
 }
 
 @keyframes avatarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
