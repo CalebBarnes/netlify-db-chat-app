@@ -9,11 +9,12 @@ export const fetchUserAvatar = async (username) => {
   const response = await fetch(
     `/.netlify/functions/user-avatar?username=${encodeURIComponent(username)}`
   );
-  const result = await response.json();
 
   if (!response.ok) {
     throw new Error(`Failed to fetch avatar: ${response.status}`);
   }
+
+  const result = await response.json();
 
   return {
     hasAvatar: result.hasAvatar,
@@ -36,7 +37,7 @@ export const useUserAvatar = (username) => {
 
     // Cache settings optimized for avatars
     staleTime: 5 * 60 * 1000, // 5 minutes - avatars don't change often
-    cacheTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
 
     // Retry settings
     retry: 2,
@@ -46,7 +47,7 @@ export const useUserAvatar = (username) => {
     refetchOnWindowFocus: false,
 
     // Don't refetch on reconnect unless data is stale
-    refetchOnReconnect: "always",
+    refetchOnReconnect: true,
 
     // Error handling
     onError: (error) => {

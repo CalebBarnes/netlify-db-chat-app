@@ -2044,7 +2044,7 @@ const queryClient = new QueryClient({
       // Cache avatars for 5 minutes before considering them stale
       staleTime: 5 * 60 * 1000, // 5 minutes
       // Keep avatars in cache for 10 minutes after they become unused
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
       // Retry failed requests up to 2 times
       retry: 2,
       // Don't refetch on window focus for avatars (they don't change often)
