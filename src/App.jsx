@@ -5,6 +5,8 @@ import DOMPurify from 'dompurify'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import ThemeToggle from './ThemeToggle'
+import DirectMessages from './DirectMessages'
+import DMConversation from './DMConversation'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 import Avatar from './Avatar'
@@ -2070,6 +2072,28 @@ function MainChat() {
         </div>
       )}
 
+      {/* DM Mode - render DM components when in DM routes */}
+      {isInDMMode && (
+        <>
+          {location.pathname === '/dm' ? (
+            <DirectMessages
+              username={username}
+              onBack={() => navigate('/')}
+              soundSettings={soundSettings}
+              playMessageSound={playMessageSound}
+            />
+          ) : location.pathname.startsWith('/dm/') ? (
+            <DMConversation
+              username={username}
+              targetUsername={decodeURIComponent(location.pathname.split('/dm/')[1])}
+              onBack={() => navigate('/dm')}
+              soundSettings={soundSettings}
+              playMessageSound={playMessageSound}
+            />
+          ) : null}
+        </>
+      )}
+
       {/* Avatar Upload Modal */}
       {showAvatarUpload && (
         <AvatarUpload
@@ -2083,13 +2107,22 @@ function MainChat() {
   )
 }
 
-// Main App Component
-function App() {
+// Router wrapper component that handles all routing
+function AppRouter() {
   return (
     <Router>
-      <MainChat />
+      <Routes>
+        <Route path="/" element={<MainChat />} />
+        <Route path="/dm" element={<MainChat />} />
+        <Route path="/dm/:username" element={<MainChat />} />
+      </Routes>
     </Router>
   )
+}
+
+// Main App Component
+function App() {
+  return <AppRouter />
 }
 // Create QueryClient instance with optimized settings for avatar caching
 const queryClient = new QueryClient({
