@@ -520,6 +520,14 @@ function MainChat() {
   // Check if we're in DM mode based on current route
   const isInDMMode = location.pathname.startsWith('/dm')
 
+  // Extract DM target username from URL if in DM conversation mode
+  const dmTargetUsername = isInDMMode && location.pathname.startsWith('/dm/')
+    ? decodeURIComponent(location.pathname.split('/dm/')[1])
+    : null
+
+  // Determine if we're in a specific DM conversation vs DM list
+  const isInDMConversation = dmTargetUsername !== null
+
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -1032,6 +1040,32 @@ function MainChat() {
     setError(null)
   }
 
+  // Helper function to get or create conversation ID for DMs
+  const getOrCreateConversationId = async (targetUsername) => {
+    try {
+      const response = await fetch('/.netlify/functions/dm-conversation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          targetUsername: targetUsername
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      return result.conversationId
+    } catch (error) {
+      console.error('Error getting/creating conversation:', error)
+      throw error
+    }
+  }
+
   const sendMessage = async (e) => {
     e.preventDefault()
     if (!newMessage.trim()) return
@@ -1043,18 +1077,31 @@ function MainChat() {
       // Stop typing indicator when sending message
       handleTypingStop()
 
-      const response = await fetch('/api/messages', {
+      // Choose endpoint based on chat mode
+      const endpoint = isInDMConversation ? '/.netlify/functions/direct-messages' : '/api/messages'
+
+      // Prepare payload based on chat mode
+      const payload = {
+        username: username.trim(),
+        message: newMessage.trim(),
+        replyToId: replyingTo?.id || null,
+        replyToUsername: replyingTo?.username || null,
+        replyPreview: replyingTo?.message || null
+      }
+
+      // Add DM-specific fields if in DM mode
+      if (isInDMConversation) {
+        // Get or create conversation ID for this DM
+        const conversationId = await getOrCreateConversationId(dmTargetUsername)
+        payload.conversationId = conversationId
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: username.trim(),
-          message: newMessage.trim(),
-          replyToId: replyingTo?.id || null,
-          replyToUsername: replyingTo?.username || null,
-          replyPreview: replyingTo?.message || null
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {

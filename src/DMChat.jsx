@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Reply } from 'lucide-react'
 import Avatar from './Avatar'
+import MessageInput from './components/MessageInput'
 
 const DMChat = ({ 
   username, 
@@ -288,48 +289,17 @@ const DMChat = ({
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="message-form">
-        {replyingTo && (
-          <div className="reply-indicator">
-            <span>Replying to {replyingTo.sender_username}: {replyingTo.message.substring(0, 50)}...</span>
-            <button onClick={cancelReply} className="cancel-reply">✕</button>
-          </div>
-        )}
-
-        <div className="input-group">
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => {
-              // Enter without Shift = send message
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                handleSendMessage(e)
-              }
-              // Shift+Enter = line break (default textarea behavior, no need to handle)
-            }}
-            placeholder={`Message ${otherUsername}... (Shift+Enter for line breaks)`}
-            disabled={submitting}
-            className="message-input"
-            maxLength={1000}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            rows={1}
-            style={{ resize: 'none', overflow: 'hidden' }}
-          />
-          <button
-            type="submit"
-            disabled={!newMessage.trim() || submitting}
-            className="send-btn"
-            aria-label={submitting ? 'Sending message...' : 'Send message'}
-            title={submitting ? 'Sending...' : 'Send'}
-          >
-            {submitting ? '...' : '→'}
-          </button>
-        </div>
-      </form>
+      <MessageInput
+        message={newMessage}
+        onMessageChange={setNewMessage}
+        onSendMessage={handleSendMessage}
+        placeholder={`Message ${otherUsername}... (Shift+Enter for line breaks)`}
+        disabled={submitting}
+        replyingTo={replyingTo}
+        onCancelReply={cancelReply}
+        enableAutoResize={false} // DM doesn't need auto-resize
+        showActionsMenu={false} // DM doesn't have actions menu
+      />
     </div>
   )
 }
