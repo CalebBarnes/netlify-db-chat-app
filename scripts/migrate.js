@@ -135,8 +135,8 @@ class MigrationRunner {
           );
           try {
             // Execute raw SQL using template literal syntax
-            // This works with neon client by creating a template literal dynamically
-            await this.sql([statement]);
+            // Use unsafe() for dynamic SQL execution with proper error handling
+            await this.sql.unsafe(statement);
             console.log(`   ✅ Statement ${i + 1} executed successfully`);
           } catch (stmtError) {
             console.error(`   ❌ Statement ${i + 1} failed:`, stmtError);
