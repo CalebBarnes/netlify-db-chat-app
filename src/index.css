@@ -2845,6 +2845,11 @@ body {
   border: none;
 }
 
+/* Header avatar loading state - also no border */
+.header-avatar.avatar-container.loading {
+  border: none;
+}
+
 .avatar-container.clickable {
   cursor: pointer;
   transition: all 0.2s ease;
