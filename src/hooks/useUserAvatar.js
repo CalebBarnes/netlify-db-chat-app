@@ -61,7 +61,11 @@ export const useUserAvatar = (username) => {
 
     // Error handling
     onError: (error) => {
-      console.warn(`Failed to fetch avatar for ${username}:`, error);
+      console.warn(`Failed to fetch avatar for ${username}:`, {
+        username,
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      });
     },
   });
 };

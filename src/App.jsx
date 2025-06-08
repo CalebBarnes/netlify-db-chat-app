@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, useLoca
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 import Avatar from './Avatar'
 import AvatarUpload from './AvatarUpload'
-import DirectMessages from './DirectMessages'
-import DMConversation from './DMConversation'
+
 
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
 import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github, ChevronDown, User, MessageCircle } from 'lucide-react'
@@ -1579,7 +1579,6 @@ function MainChat() {
               className="dm-button"
               onClick={() => navigate(isInDMMode ? '/' : '/dm')}
               aria-label={isInDMMode ? 'Back to main chat' : 'Open direct messages'}
-              title={isInDMMode ? 'Back to main chat' : 'Direct Messages'}
             >
               <MessageCircle size={18} />
             </button>
@@ -1608,7 +1607,6 @@ function MainChat() {
                   username={username}
                   size={24}
                   className="header-avatar"
-                  key={avatarRefreshTrigger}
                 />
                 <ChevronDown size={14} className="dropdown-arrow" />
               </button>
@@ -2177,6 +2175,7 @@ const AppWithQueryClient = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <App />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }
