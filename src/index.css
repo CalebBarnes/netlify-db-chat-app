@@ -797,10 +797,15 @@ body {
 
 .message-header {
   display: flex;
-  align-items: baseline; /* Align username and timestamp on baseline */
+  align-items: center; /* Changed to center for avatar alignment */
   margin-bottom: 4px; /* Tighter spacing */
   font-size: 12px;
   gap: 8px;
+}
+
+.message-avatar {
+  flex-shrink: 0; /* Prevent avatar from shrinking */
+  margin-right: 4px; /* Small gap between avatar and username */
 }
 
 .message-username {
@@ -2803,4 +2808,319 @@ body {
   .volume-control input[type="range"] {
     width: 100%;
   }
+}
+
+/* ===== AVATAR COMPONENTS ===== */
+
+/* Avatar Container */
+.avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-container.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatar-container.clickable:hover {
+  border-color: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+/* Avatar Image */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Avatar Fallback */
+.avatar-container.fallback {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+.avatar-initials {
+  font-weight: 600;
+  font-family: var(--font-family);
+}
+
+/* Avatar Loading */
+.avatar-container.loading {
+  background: var(--bg-tertiary);
+}
+
+.avatar-loading-spinner {
+  width: 60%;
+  height: 60%;
+  border: 2px solid var(--border-primary);
+  border-top: 2px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: avatarSpin 1s linear infinite;
+}
+
+@keyframes avatarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== AVATAR UPLOAD MODAL ===== */
+
+.avatar-upload-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.avatar-upload-content {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-upload-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.avatar-upload-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.close-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.avatar-upload-body {
+  padding: 20px;
+}
+
+/* Current Avatar Section */
+.current-avatar-section {
+  margin-bottom: 30px;
+}
+
+.current-avatar-section h4 {
+  margin: 0 0 15px 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.avatar-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.avatar-preview .avatar-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-primary);
+}
+
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.remove-avatar-button {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.remove-avatar-button:hover {
+  background: var(--error-hover);
+}
+
+.remove-avatar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Upload Section */
+.upload-section h4,
+.upload-section h5 {
+  margin: 0 0 15px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.upload-section h4 {
+  font-size: 1rem;
+}
+
+.upload-section h5 {
+  font-size: 0.9rem;
+}
+
+.file-input-container {
+  margin-bottom: 20px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-select-button {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+}
+
+.file-select-button:hover {
+  background: var(--accent-hover);
+}
+
+.file-select-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Preview Section */
+.preview-section {
+  margin-bottom: 20px;
+}
+
+.upload-button {
+  background: var(--success-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: block;
+  margin: 15px auto 0;
+}
+
+.upload-button:hover {
+  background: var(--success-hover);
+}
+
+.upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Messages */
+.error-message {
+  background: var(--error-bg);
+  color: var(--error-color);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  border: 1px solid var(--error-border);
+}
+
+.success-message {
+  background: var(--success-bg);
+  color: var(--success-color);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  border: 1px solid var(--success-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Upload Guidelines */
+.upload-guidelines {
+  background: var(--bg-secondary);
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid var(--border-primary);
+}
+
+.upload-guidelines h5 {
+  margin: 0 0 10px 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.upload-guidelines ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.upload-guidelines li {
+  margin-bottom: 4px;
 }
