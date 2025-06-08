@@ -2085,7 +2085,11 @@ function MainChat() {
 
 // Main App Component
 function App() {
-  return <MainChat />
+  return (
+    <Router>
+      <MainChat />
+    </Router>
+  )
 }
 // Create QueryClient instance with optimized settings for avatar caching
 const queryClient = new QueryClient({
