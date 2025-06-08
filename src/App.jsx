@@ -2083,80 +2083,10 @@ function MainChat() {
   )
 }
 
-<<<<<<< HEAD
-// DM Route Component
-function DMRoute() {
-  const { username: targetUsername } = useParams()
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [soundSettings, setSoundSettings] = useState({
-    enabled: true,
-    volume: 0.5
-  })
-
-  // Get username from localStorage (use same key as MainChat)
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('chatapp-username')
-    if (storedUsername?.trim()) {
-      setUsername(storedUsername.trim())
-    }
-  }, [])
-
-  // Load sound settings
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('soundSettings')
-    if (savedSettings) {
-      setSoundSettings(JSON.parse(savedSettings))
-    }
-  }, [])
-
-  const playMessageSound = () => {
-    if (soundSettings.enabled) {
-      const audio = new Audio('/message-sound.mp3')
-      audio.volume = soundSettings.volume
-      audio.play().catch(console.error)
-    }
-  }
-
-  // If we have a targetUsername, show the individual conversation
-  if (targetUsername) {
-    return (
-      <DMConversation
-        username={username}
-        targetUsername={targetUsername}
-        onBack={() => navigate('/dm')}
-        soundSettings={soundSettings}
-        playMessageSound={playMessageSound}
-      />
-    )
-  }
-
-  // Otherwise, show the conversation list
-  return (
-    <DirectMessages
-      username={username}
-      onBack={() => navigate('/')}
-      soundSettings={soundSettings}
-      playMessageSound={playMessageSound}
-    />
-  )
-}
-
-// Main App Component with Router
+// Main App Component
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainChat />} />
-        <Route path="/dm" element={<DMRoute />} />
-        <Route path="/dm/:username" element={<DMRoute />} />
-      </Routes>
-    </Router>
-  )
+  return <MainChat />
 }
-
-=======
->>>>>>> origin/main
 // Create QueryClient instance with optimized settings for avatar caching
 const queryClient = new QueryClient({
   defaultOptions: {
