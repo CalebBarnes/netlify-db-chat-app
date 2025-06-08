@@ -85,6 +85,10 @@ This file contains important context and memories from previous interactions to 
 - User prefers to focus on completing current PRs, addressing all feedback, and ensuring thorough completion before moving to new development work.
 - User prefers natural, conversational chat messages instead of formal product manager-style status updates when talking to chat users.
 - When interacting with Lumi chat users, use natural conversational language instead of formal status updates, but when talking directly with Caleb, detailed technical communication is appropriate.
+- User prefers me to have confidence in my technical judgment and make decisions independently when the path forward is clear - "you have good judgement. dont need to ask every time".
+- ALWAYS check recent chat messages before sending any message to avoid missing important context or replies.
+- User prefers me to use MCP tools for chat interaction instead of Playwright browser automation when both options are available.
+- When using MCP tools, I should check recent chat messages before sending messages to ensure proper context and avoid missing important information.
 
 ## Technical Implementation Notes
 - This project uses Netlify DB for data persistence
@@ -94,9 +98,12 @@ This file contains important context and memories from previous interactions to 
 - Project follows proper Git workflow with feature branches and PRs
 - Automated code review is handled by CodeRabbit
 - Production deployment happens through Netlify after PR merges
+- MCP (Model Context Protocol) integration enables direct chat interaction through tools instead of browser automation
+- The correct MCP server configuration format for Augment uses absolute paths in args array and includes env variables like CHAT_API_BASE
 
 ## Key Project Milestones
 - Successfully implemented comprehensive theming system with multiple theme options
 - Completed Discord-style reply system implementation (PR #39)
 - Established proper development workflow with GitHub issues and PRs
 - Integrated automated code review and deployment processes
+- Successfully implemented MCP Chat Interaction Tool (PR #73) - enables direct chat interaction through MCP tools instead of browser automation, significantly improving development workflow efficiency
