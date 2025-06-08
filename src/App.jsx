@@ -4,6 +4,8 @@ import DOMPurify from 'dompurify'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
+import Avatar from './Avatar'
+import AvatarUpload from './AvatarUpload'
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
 import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github, ChevronDown, User } from 'lucide-react'
 
@@ -279,7 +281,9 @@ const MentionsAutocomplete = React.memo(({
 const UserMenu = React.memo(({
   show,
   username,
+  currentUserAvatar,
   onSettingsClick,
+  onAvatarUploadClick,
   onLogoutClick,
   onClose
 }) => {
@@ -295,8 +299,13 @@ const UserMenu = React.memo(({
       />
       <div className="user-menu">
         <div className="user-menu-header">
-          <div className="user-avatar">
-            <User size={20} />
+          <div className="user-avatar" onClick={onAvatarUploadClick}>
+            <Avatar
+              username={username}
+              size={40}
+              className="clickable"
+              onClick={onAvatarUploadClick}
+            />
           </div>
           <div className="user-info">
             <div className="user-name">{username}</div>
@@ -305,6 +314,13 @@ const UserMenu = React.memo(({
         </div>
         <div className="user-menu-divider" />
         <div className="user-menu-actions">
+          <button
+            className="user-menu-item"
+            onClick={onAvatarUploadClick}
+          >
+            <Upload size={16} />
+            <span>Change Avatar</span>
+          </button>
           <button
             className="user-menu-item"
             onClick={onSettingsClick}
@@ -485,6 +501,11 @@ function App() {
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0)
   const [filteredUsers, setFilteredUsers] = useState([])
   const [allParticipants, setAllParticipants] = useState([])
+
+  // Avatar upload states
+  const [showAvatarUpload, setShowAvatarUpload] = useState(false)
+  const [currentUserAvatar, setCurrentUserAvatar] = useState(null)
+
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -1421,6 +1442,44 @@ function App() {
     setLightboxImage(null)
   }
 
+  // Avatar functionality handlers
+  const fetchCurrentUserAvatar = async () => {
+    if (!username.trim()) return
+
+    try {
+      const response = await fetch(`/.netlify/functions/user-avatar?username=${encodeURIComponent(username.trim())}`)
+      const result = await response.json()
+
+      if (response.ok && result.hasAvatar) {
+        setCurrentUserAvatar(result.avatar.avatarUrl)
+      } else {
+        setCurrentUserAvatar(null)
+      }
+    } catch (error) {
+      console.error('Error fetching user avatar:', error)
+      setCurrentUserAvatar(null)
+    }
+  }
+
+  const handleAvatarUpdate = (newAvatarUrl) => {
+    setCurrentUserAvatar(newAvatarUrl)
+  }
+
+  const handleAvatarUploadClick = () => {
+    setShowAvatarUpload(true)
+  }
+
+  const closeAvatarUpload = () => {
+    setShowAvatarUpload(false)
+  }
+
+  // Fetch current user's avatar when username is set
+  useEffect(() => {
+    if (isUsernameSet && username.trim()) {
+      fetchCurrentUserAvatar()
+    }
+  }, [isUsernameSet, username])
+
   if (loading) {
     return (
       <div className="app">
@@ -1511,9 +1570,11 @@ function App() {
                 aria-expanded={showUserMenu}
                 title={`${username} - User menu`}
               >
-                <div className="user-avatar">
-                  <User size={18} />
-                </div>
+                <Avatar
+                  username={username}
+                  size={24}
+                  className="header-avatar"
+                />
                 <ChevronDown size={14} className="dropdown-arrow" />
               </button>
 
@@ -1522,9 +1583,14 @@ function App() {
                 <UserMenu
                   show={showUserMenu}
                   username={username}
+                  currentUserAvatar={currentUserAvatar}
                   onSettingsClick={() => {
                     setShowUserMenu(false)
                     setShowSettingsMenu(true)
+                  }}
+                  onAvatarUploadClick={() => {
+                    setShowUserMenu(false)
+                    handleAvatarUploadClick()
                   }}
                   onLogoutClick={() => {
                     setShowUserMenu(false)
@@ -1946,6 +2012,16 @@ function App() {
             onClick={(e) => e.stopPropagation()}
           />
         </div>
+      )}
+
+      {/* Avatar Upload Modal */}
+      {showAvatarUpload && (
+        <AvatarUpload
+          username={username}
+          currentAvatarUrl={currentUserAvatar}
+          onAvatarUpdate={handleAvatarUpdate}
+          onClose={closeAvatarUpload}
+        />
       )}
     </div>
   )
