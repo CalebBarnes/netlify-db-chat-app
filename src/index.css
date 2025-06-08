@@ -428,7 +428,7 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px; /* Slightly tighter spacing for better visual balance */
 }
 
 /* User avatar container for dropdown positioning */
@@ -643,18 +643,31 @@ body {
 }
 
 .sidebar-toggle {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 10px 12px; /* Match GitHub link padding */
+  border-radius: 8px; /* Match GitHub link border radius */
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease; /* Match GitHub link transition */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Match GitHub link shadow */
 }
 
 .sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  border-color: var(--border-focus); /* Highlight border on hover */
+}
+
+.sidebar-toggle:active {
+  transform: translateY(0);
 }
 
 .username-form {
@@ -2396,8 +2409,8 @@ body {
   background: var(--bg-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border-primary);
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 12px; /* Slightly more padding for better touch targets */
+  border-radius: 8px; /* Slightly more rounded for modern look */
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -2406,7 +2419,7 @@ body {
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  margin-right: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 .github-link:hover {
@@ -2414,6 +2427,8 @@ body {
   transform: translateY(-1px);
   color: var(--text-primary);
   text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  border-color: var(--border-focus); /* Highlight border on hover */
 }
 
 .github-link:active {
