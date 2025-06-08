@@ -450,7 +450,7 @@ function App() {
   const [soundSettingsLoaded, setSoundSettingsLoaded] = useState(false)
 
   // Reply functionality state
-  const [replyingTo, setReplyingTo] = useState(null) // { id, username, message }
+  const [replyingTo, setReplyingTo] = useState(null) // { id, username, message, mentionEnabled }
 
   // Image upload states
   const [selectedImage, setSelectedImage] = useState(null)
@@ -1177,11 +1177,21 @@ function App() {
 
   // Reply functionality handlers
   const handleReply = (message) => {
-    setReplyingTo({
+    const replyState = {
       id: message.id,
       username: message.username,
-      message: message.message.substring(0, 100) // Preview first 100 chars
-    })
+      message: message.message.substring(0, 100), // Preview first 100 chars
+      mentionEnabled: true // Default to ON
+    }
+
+    setReplyingTo(replyState)
+
+    // Auto-add @username to message input if mention enabled
+    if (replyState.mentionEnabled && !newMessage.includes(`@${message.username}`)) {
+      const currentMessage = newMessage.trim()
+      const mentionText = `@${message.username} `
+      setNewMessage(currentMessage ? `${mentionText}${currentMessage}` : mentionText)
+    }
 
     // Highlight the message being replied to
     const messageElement = document.querySelector(`[data-message-id="${message.id}"]`)
@@ -1197,6 +1207,28 @@ function App() {
 
     // Focus the input field
     messageInputRef.current?.focus()
+  }
+
+  const toggleMention = () => {
+    if (!replyingTo) return
+
+    const newMentionState = !replyingTo.mentionEnabled
+    const mentionText = `@${replyingTo.username} `
+
+    setReplyingTo(prev => ({ ...prev, mentionEnabled: newMentionState }))
+
+    // Update message input based on new mention state
+    if (newMentionState) {
+      // Add @username if not already present
+      if (!newMessage.includes(`@${replyingTo.username}`)) {
+        const currentMessage = newMessage.trim()
+        setNewMessage(currentMessage ? `${mentionText}${currentMessage}` : mentionText)
+      }
+    } else {
+      // Remove @username from message
+      const updatedMessage = newMessage.replace(new RegExp(`@${replyingTo.username}\\s*`, 'g'), '').trim()
+      setNewMessage(updatedMessage)
+    }
   }
 
   const cancelReply = () => {
@@ -1716,15 +1748,29 @@ function App() {
               </span>
               <span className="reply-preview-text">{replyingTo.message}</span>
             </div>
-            <button
-              type="button"
-              className="reply-cancel-btn"
-              onClick={cancelReply}
-              aria-label="Cancel reply"
-              title="Cancel reply"
-            >
-              <X size={14} />
-            </button>
+            <div className="reply-controls">
+              <button
+                type="button"
+                className={`mention-toggle ${replyingTo.mentionEnabled ? 'on' : 'off'}`}
+                onClick={toggleMention}
+                title={replyingTo.mentionEnabled ?
+                  "Click to disable pinging the original author" :
+                  "Click to enable pinging the original author"
+                }
+                aria-label={`Mention toggle: ${replyingTo.mentionEnabled ? 'ON' : 'OFF'}`}
+              >
+                @ {replyingTo.mentionEnabled ? 'ON' : 'OFF'}
+              </button>
+              <button
+                type="button"
+                className="reply-cancel-btn"
+                onClick={cancelReply}
+                aria-label="Cancel reply"
+                title="Cancel reply"
+              >
+                <X size={14} />
+              </button>
+            </div>
           </div>
         )}
 
