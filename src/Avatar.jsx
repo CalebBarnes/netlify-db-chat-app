@@ -1,53 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { User } from 'lucide-react'
+import { useUserAvatar } from './hooks/useUserAvatar'
 
-const Avatar = ({ 
-  username, 
-  size = 32, 
-  className = '', 
+const Avatar = ({
+  username,
+  size = 32,
+  className = '',
   showFallback = true,
-  onClick = null 
+  onClick = null
 }) => {
-  const [avatarUrl, setAvatarUrl] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  // Use React Query hook for avatar data with automatic caching and deduplication
+  const { data: avatarData, isLoading: loading, isError: error } = useUserAvatar(username)
 
-  // Fetch user avatar
-  useEffect(() => {
-    if (!username) {
-      setLoading(false)
-      return
-    }
+  // Extract avatar URL from query data
+  const avatarUrl = avatarData?.avatarUrl || null
 
-    const fetchAvatar = async () => {
-      try {
-        setLoading(true)
-        setError(false)
-
-        const response = await fetch(`/.netlify/functions/user-avatar?username=${encodeURIComponent(username)}`)
-        const result = await response.json()
-
-        if (response.ok && result.hasAvatar) {
-          setAvatarUrl(result.avatar.avatarUrl)
-        } else {
-          setAvatarUrl(null)
-        }
-      } catch (err) {
-        console.error('Error fetching avatar:', err)
-        setError(true)
-        setAvatarUrl(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchAvatar()
-  }, [username])
-
-  // Handle image load error
+  // Handle image load error (fallback to initials/icon)
   const handleImageError = () => {
-    setError(true)
-    setAvatarUrl(null)
+    // React Query will handle retries automatically
+    // This just triggers fallback display
   }
 
   // Generate initials from username as fallback
@@ -88,7 +59,7 @@ const Avatar = ({
 
   if (avatarUrl && !error) {
     return (
-      <div 
+      <div
         className={containerClasses}
         style={avatarStyle}
         onClick={onClick}
