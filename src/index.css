@@ -1111,6 +1111,76 @@ body {
   }
 }
 
+/* 🎯 @ MENTIONS AUTOCOMPLETE STYLES - Discord-inspired */
+.mentions-autocomplete {
+  position: absolute;
+  z-index: 1001;
+  animation: slideUpFadeIn 0.2s ease-out;
+}
+
+.mentions-autocomplete-content {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  max-width: 320px;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.mentions-autocomplete-header {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  text-align: left;
+}
+
+.mention-item:hover,
+.mention-item.selected {
+  background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.mention-item:focus {
+  outline: none;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.mention-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mention-username {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mention-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
