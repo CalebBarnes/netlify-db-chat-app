@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Reply } from 'lucide-react'
 import Avatar from './Avatar'
-import MessageInput from './components/MessageInput'
+import MessageInput from './components/MessageInput.tsx'
 
 const DMChat = ({ 
   username, 

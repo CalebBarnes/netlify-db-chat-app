@@ -792,7 +792,23 @@ function MainChat() {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch('/api/messages')
+
+      // Choose endpoint based on chat mode
+      let endpoint = '/api/messages'
+      if (isInDMConversation) {
+        // For DM conversations, get messages for specific conversation
+        try {
+          const conversationId = await getOrCreateConversationId(dmTargetUsername)
+          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}`
+        } catch (error) {
+          console.error('Error getting conversation ID:', error)
+          setError('Failed to load conversation')
+          setLoading(false)
+          return
+        }
+      }
+
+      const response = await fetch(endpoint)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -817,8 +833,20 @@ function MainChat() {
     if (!lastMessageIdRef.current) return
 
     try {
+      // Choose endpoint based on chat mode
+      let endpoint = `/api/messages?sinceId=${lastMessageIdRef.current}`
+      if (isInDMConversation) {
+        try {
+          const conversationId = await getOrCreateConversationId(dmTargetUsername)
+          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&sinceId=${lastMessageIdRef.current}`
+        } catch (error) {
+          console.error('Error getting conversation ID for new messages:', error)
+          return
+        }
+      }
+
       // Only get messages with ID greater than the last known message ID
-      const response = await fetch(`/api/messages?sinceId=${lastMessageIdRef.current}`)
+      const response = await fetch(endpoint)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -1607,8 +1635,39 @@ function MainChat() {
       <div className="header">
         <div className="header-content">
           <div className="header-left">
-            <h1>🌟 Lumi Chat</h1>
-            <p>Welcome, <strong>{username}</strong>! ✨ Bringing warm light to your conversations</p>
+            {isInDMConversation ? (
+              // DM conversation header
+              <>
+                <button
+                  onClick={() => navigate('/dm')}
+                  className="back-button"
+                  aria-label="Back to DM list"
+                >
+                  ←
+                </button>
+                <h1>💬 {dmTargetUsername}</h1>
+                <p>Direct message conversation</p>
+              </>
+            ) : isInDMMode ? (
+              // DM list header
+              <>
+                <button
+                  onClick={() => navigate('/')}
+                  className="back-button"
+                  aria-label="Back to main chat"
+                >
+                  ←
+                </button>
+                <h1>💬 Direct Messages</h1>
+                <p>Your private conversations</p>
+              </>
+            ) : (
+              // Main chat header
+              <>
+                <h1>🌟 Lumi Chat</h1>
+                <p>Welcome, <strong>{username}</strong>! ✨ Bringing warm light to your conversations</p>
+              </>
+            )}
           </div>
           <div className="header-right">
             {/* Primary actions - GitHub link */}
