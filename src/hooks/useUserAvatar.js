@@ -10,6 +10,16 @@ export const fetchUserAvatar = async (username) => {
     `/.netlify/functions/user-avatar?username=${encodeURIComponent(username)}`
   );
 
+  // Handle 404 as a successful "no avatar" response
+  if (response.status === 404) {
+    return {
+      hasAvatar: false,
+      avatarUrl: null,
+      username: username,
+    };
+  }
+
+  // Only throw for other non-ok responses (500, 400, etc.)
   if (!response.ok) {
     throw new Error(`Failed to fetch avatar: ${response.status}`);
   }
