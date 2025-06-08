@@ -2840,6 +2840,11 @@ body {
   flex-shrink: 0;
 }
 
+/* Header avatar - no border for cleaner look */
+.header-avatar.avatar-container {
+  border: none;
+}
+
 .avatar-container.clickable {
   cursor: pointer;
   transition: all 0.2s ease;
