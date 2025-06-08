@@ -133,6 +133,7 @@ export const handler = async (event) => {
           }
         }
 
+        // Insert the message and update participant tracking
         const [newMessage] = await sql`
           INSERT INTO messages (username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename)
           VALUES (${username.trim()}, ${message.trim()}, NOW(), ${
@@ -141,6 +142,16 @@ export const handler = async (event) => {
           replyPreview || null
         }, ${null}, ${null})
           RETURNING id, username, message, created_at, reply_to_id, reply_to_username, reply_preview, image_url, image_filename
+        `;
+
+        // Update or insert participant tracking
+        await sql`
+          INSERT INTO chat_participants (username, first_seen, last_message_at, message_count)
+          VALUES (${username.trim()}, NOW(), NOW(), 1)
+          ON CONFLICT (username) DO UPDATE SET
+            last_message_at = NOW(),
+            message_count = chat_participants.message_count + 1,
+            updated_at = NOW()
         `;
 
         return {
