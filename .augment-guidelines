@@ -36,29 +36,32 @@ This file contains important context and memories from previous interactions to 
 - User prefers to temporarily hide the theme button/indicator when there's only one theme option available, rather than showing a single-option theme selector.
 
 ## Project Management Workflow
+- User prefers to use GitHub issues as the source of truth for project management - always create GitHub issues for backlog items and feature suggestions to maintain proper tracking.
 - User prefers to use GitHub issues to track and manage feature requests and suggestions from users.
 - User prefers to propose brand identity and styling changes in GitHub issues first to get feedback before implementing them.
 - User prefers to use feature branches and pull requests for new features rather than committing directly to main branch.
-- User prefers to read PR feedback, merge when ready, then work on next issues using new feature branches for each task.
+- When creating new feature branches, always pull latest changes from main branch first to ensure the feature branch is based on the most recent code, preventing merge conflicts and ensuring all recent changes are included.
+- User prefers to read PR feedback, merge when ready and good, and expects me to understand the correct merge order (prioritize older PRs first by creation date, unless there are dependency conflicts), then work on next issues using new feature branches for each task.
 - User prefers to check PR feedback from automated code review tools (like CodeRabbit) and ensure all feedback is addressed before merging PRs.
+- User prefers to check PR feedback thoroughly before merging PRs to ensure all review comments are addressed.
 - User prefers to verify PRs are thoroughly reviewed and confirmed good before merging PRs.
 - User prefers to check PRs for reviews and ensure all feedback is addressed before merging PRs.
 - User prefers to check PRs for reviews and feedback before continuing with the development workflow.
+- User prefers to check PR status, merge immediately if all good, or wait and recheck periodically if PR is currently being reviewed.
 - User prefers to focus on current PRs and get them reviewed/merged before starting new development work.
+- User prefers to ensure PRs are thoroughly reviewed and merged before continuing with next development tasks.
 - User prefers to continue working on all issues in priority order with PRs for each feature implementation.
+- User prefers to consider and review the priority of all GitHub issues before starting new development work to ensure proper task prioritization.
 - User prefers to check and close completed issues before continuing work on highest priority issues in the development workflow.
 - User prefers to deploy to production after merging PRs and updating main branch, following proper deployment workflows.
 - User prefers to share GitHub issues workflow and development planning process transparently with chat community members who are interested in how the project works.
 - User prefers to cross-reference GitHub issues with closed/open PRs to identify completed work and ensure proper labeling of all issues.
-- When creating new feature branches, always pull latest changes from main branch first to ensure the feature branch is based on the most recent code, preventing merge conflicts and ensuring all recent changes are included.
-- User prefers to check PR feedback thoroughly before merging PRs to ensure all review comments are addressed.
-- User prefers to check PR status, merge immediately if all good, or wait and recheck periodically if PR is currently being reviewed.
-- User prefers to ensure PRs are thoroughly reviewed and merged before continuing with next development tasks.
 - User prefers to store project memories and guidelines in a .augment-guidelines file in the repository root.
 - The correct repository URL is https://github.com/CalebBarnes/netlify-db-chat-app and user prefers the README to accurately reflect the current project state.
 - User expects PRs to be properly linked to GitHub issues using 'closes #issue-number' syntax to automatically close issues when PRs are merged. When creating PRs for feature branches that address specific GitHub issues, always link the PR to the issue using "closes #[issue-number]" in the PR title or description so the issue automatically closes when the PR merges, making it easier to track changes.
 - User prefers to merge gradient PR before adding another theme to maintain clean development workflow.
 - The Netlify project/site is named 'lumi-chat'.
+- The Spotify PR (#58) was created before the comprehensive UX overhaul and will likely have significant merge conflicts that need to be resolved.
 
 ## Development Environment & Security
 - User prefers to use 'netlify dev' instead of 'npm dev' when running the development server for this Netlify project.
@@ -77,6 +80,7 @@ This file contains important context and memories from previous interactions to 
 - When using Playwright to test or work on the app, I should check recent chat messages for any directed towards me (@Lumi mentions or replies) and interact with those users before continuing with development work.
 
 ## Workflow
+- The proper workflow is: 1) ALWAYS check chat for @Lumi mentions/replies FIRST and respond to users before any development work, 2) Check current PR status and address existing PRs before creating new work, 3) Follow proper merge order to prevent conflicts - this prevents workflow violations like I made when I merged PR #67 without checking that PR #58 (Spotify Integration) had been waiting since June 7th with 18 CodeRabbit comments.
 - When user sends just "." it means "continue workflow" - same as typing "continue workflow".
 - User prefers to focus on completing current PRs, addressing all feedback, and ensuring thorough completion before moving to new development work.
 - User prefers natural, conversational chat messages instead of formal product manager-style status updates when talking to chat users.
