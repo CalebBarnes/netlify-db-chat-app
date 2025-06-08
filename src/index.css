@@ -1369,8 +1369,30 @@ body {
 }
 
 .mention-status {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-indicator {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Status-specific styling for mention items */
+.mention-item.online {
+  border-left: 2px solid #22c55e;
+}
+
+.mention-item.recently_active {
+  border-left: 2px solid #eab308;
+}
+
+.mention-item.offline {
+  border-left: 2px solid #6b7280;
+  opacity: 0.8;
 }
 
 @keyframes slideUp {

@@ -221,6 +221,21 @@ const MentionsAutocomplete = React.memo(({
 }) => {
   if (!show || !users.length) return null
 
+  const getStatusIndicator = (user) => {
+    if (user.is_typing) return { icon: '✏️', text: 'typing...' }
+
+    switch (user.status) {
+      case 'online':
+        return { icon: '🟢', text: 'online' }
+      case 'recently_active':
+        return { icon: '🟡', text: 'recently active' }
+      case 'offline':
+        return { icon: '⚫', text: 'offline' }
+      default:
+        return { icon: '⚫', text: 'offline' }
+    }
+  }
+
   return (
     <div
       className="mentions-autocomplete"
@@ -235,22 +250,26 @@ const MentionsAutocomplete = React.memo(({
         <div className="mentions-autocomplete-header">
           <span>@ Mention Users</span>
         </div>
-        {users.map((user, index) => (
-          <button
-            key={user.username}
-            type="button"
-            className={`mention-item ${index === selectedIndex ? 'selected' : ''}`}
-            onClick={() => onSelect(user)}
-            title={`Mention ${user.username}`}
-          >
-            <div className="mention-user-info">
-              <span className="mention-username">@{user.username}</span>
-              <span className="mention-status">
-                {user.is_typing ? 'typing...' : 'online'}
-              </span>
-            </div>
-          </button>
-        ))}
+        {users.map((user, index) => {
+          const statusInfo = getStatusIndicator(user)
+          return (
+            <button
+              key={user.username}
+              type="button"
+              className={`mention-item ${index === selectedIndex ? 'selected' : ''} ${user.status}`}
+              onClick={() => onSelect(user)}
+              title={`Mention ${user.username} (${statusInfo.text})`}
+            >
+              <div className="mention-user-info">
+                <span className="mention-username">@{user.username}</span>
+                <span className="mention-status">
+                  <span className="status-indicator">{statusInfo.icon}</span>
+                  {statusInfo.text}
+                </span>
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -465,6 +484,7 @@ function App() {
   const [mentionStartPos, setMentionStartPos] = useState(0)
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0)
   const [filteredUsers, setFilteredUsers] = useState([])
+  const [allParticipants, setAllParticipants] = useState([])
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -569,6 +589,7 @@ function App() {
       // Initial presence update and user fetch
       updatePresence()
       fetchOnlineUsers()
+      fetchAllParticipants() // Load all participants for mentions
 
       return () => {
         clearInterval(messageInterval)
@@ -888,6 +909,35 @@ function App() {
     }
   }
 
+  // Fetch all chat participants (online and offline)
+  const fetchAllParticipants = async (query = '') => {
+    try {
+      const params = new URLSearchParams()
+      if (query.trim()) {
+        params.append('query', query.trim())
+      }
+      params.append('limit', '20')
+
+      const response = await fetch(`/.netlify/functions/participants?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setAllParticipants(data.participants)
+
+        // Update all known usernames for mention detection
+        const usernames = data.participants.map(p => p.username)
+        setAllKnownUsernames(prev => {
+          const combined = [...new Set([...prev, ...usernames])]
+          return combined
+        })
+
+        return data.participants
+      }
+    } catch (error) {
+      console.error('Error fetching participants:', error)
+    }
+    return []
+  }
+
   const updateTypingStatus = async (typing) => {
     if (!username.trim()) return
 
@@ -1051,7 +1101,7 @@ function App() {
   }
 
   // Handle @ mention detection and autocomplete
-  const handleMentionDetection = (value, cursorPos) => {
+  const handleMentionDetection = async (value, cursorPos) => {
     // Find the last @ before the cursor position
     const textBeforeCursor = value.substring(0, cursorPos)
     const lastAtIndex = textBeforeCursor.lastIndexOf('@')
@@ -1081,11 +1131,19 @@ function App() {
     setMentionQuery(query)
     setMentionStartPos(lastAtIndex)
 
-    // Filter users based on query
-    const filtered = onlineUsers.filter(user =>
-      user.username.toLowerCase().includes(query) &&
-      user.username !== username.trim()
-    )
+    // Fetch participants based on query (includes both online and offline users)
+    const participants = await fetchAllParticipants(query)
+
+    // Filter out current user and format for autocomplete
+    const filtered = participants
+      .filter(participant => participant.username !== username.trim())
+      .map(participant => ({
+        username: participant.username,
+        status: participant.status,
+        is_typing: participant.is_typing || false,
+        last_message_at: participant.last_message_at,
+        message_count: participant.message_count
+      }))
 
     setFilteredUsers(filtered)
     setSelectedMentionIndex(0)

@@ -119,26 +119,43 @@ class MigrationRunner {
     console.log(`🔄 Applying migration: ${filename}`);
 
     try {
-      // Execute the entire migration in a transaction for atomicity
-      await this.sql.begin(async (tx) => {
-        // Split the migration into individual statements safely
-        const statements = this.splitSqlStatements(content);
+      // Split the migration into individual statements safely
+      const statements = this.splitSqlStatements(content);
 
-        // Execute each statement within the transaction
-        for (const statement of statements) {
-          if (statement.trim()) {
-            await tx.unsafe(statement);
+      console.log(`   📝 Executing ${statements.length} SQL statements...`);
+
+      // Execute each statement with proper error handling
+      for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i].trim();
+        if (statement) {
+          console.log(
+            `   🔧 Statement ${i + 1}/${
+              statements.length
+            }: ${statement.substring(0, 50)}...`
+          );
+          try {
+            // Use the neon client with raw SQL execution
+            await this.sql.unsafe(statement);
+            console.log(`   ✅ Statement ${i + 1} executed successfully`);
+          } catch (stmtError) {
+            console.error(`   ❌ Statement ${i + 1} failed:`, stmtError);
+            console.error(`   📄 Failed statement: ${statement}`);
+            throw new Error(
+              `Migration ${filename} failed at statement ${i + 1}: ${
+                stmtError.message
+              }`
+            );
           }
         }
+      }
 
-        // Record that this migration has been applied (within the same transaction)
-        const version = filename.replace(".sql", "");
-        await tx`
-          INSERT INTO schema_migrations (version)
-          VALUES (${version})
-          ON CONFLICT (version) DO NOTHING
-        `;
-      });
+      // Record that this migration has been applied
+      const version = filename.replace(".sql", "");
+      await this.sql`
+        INSERT INTO schema_migrations (version)
+        VALUES (${version})
+        ON CONFLICT (version) DO NOTHING
+      `;
 
       console.log(`✅ Migration ${filename} applied successfully`);
     } catch (error) {
