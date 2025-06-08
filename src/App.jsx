@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 import Avatar from './Avatar'
 import AvatarUpload from './AvatarUpload'
+
+
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
-import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github, ChevronDown, User } from 'lucide-react'
+import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github, ChevronDown, User, MessageCircle } from 'lucide-react'
 
 // Configure marked for safe rendering with proper line break handling
 marked.setOptions({
@@ -444,7 +448,10 @@ const renderMarkdown = (text, currentUser = '', validUsernames = []) => {
   }
 }
 
-function App() {
+// Main Chat Component (uses router hooks)
+function MainChat() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [username, setUsername] = useState('')
@@ -507,6 +514,9 @@ function App() {
   const [showAvatarUpload, setShowAvatarUpload] = useState(false)
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null)
   const [avatarRefreshTrigger, setAvatarRefreshTrigger] = useState(0)
+
+  // Check if we're in DM mode based on current route
+  const isInDMMode = location.pathname.startsWith('/dm')
 
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
@@ -1365,6 +1375,16 @@ function App() {
     }, 100)
   }, [])
 
+  // Function to start a DM with a specific user
+  const startDMWithUser = useCallback((targetUsername) => {
+    if (targetUsername === username) {
+      // Don't allow DMing yourself
+      return
+    }
+    // Navigate to DM with specific user
+    navigate(`/dm/${targetUsername}`)
+  }, [username, navigate])
+
   const handleImageCancel = () => {
     setSelectedImage(null)
     setImageMessage('')
@@ -1554,6 +1574,15 @@ function App() {
               <Github size={18} />
             </a>
 
+            {/* Direct Messages button */}
+            <button
+              className="dm-button"
+              onClick={() => navigate(isInDMMode ? '/' : '/dm')}
+              aria-label={isInDMMode ? 'Back to main chat' : 'Open direct messages'}
+            >
+              <MessageCircle size={18} />
+            </button>
+
             {/* Sidebar toggle with user count in tooltip */}
             <button
               className="sidebar-toggle"
@@ -1578,7 +1607,6 @@ function App() {
                   username={username}
                   size={24}
                   className="header-avatar"
-                  key={avatarRefreshTrigger}
                 />
                 <ChevronDown size={14} className="dropdown-arrow" />
               </button>
@@ -1741,16 +1769,19 @@ function App() {
         </>
       )}
 
-      <div className="chat-container">
-        <div className="messages-container">
-          <div className="messages-list">
-            {messages.length === 0 ? (
-              <div className="empty-state">
-                <h3>✨ Welcome to Lumi Chat!</h3>
-                <p>Share your thoughts and let the warm light of conversation begin! 🌟</p>
-              </div>
-            ) : (
-              messages.map(message => (
+      {/* Main chat content - only show when not in DM mode */}
+      {!isInDMMode && (
+        <>
+          <div className="chat-container">
+            <div className="messages-container">
+              <div className="messages-list">
+                {messages.length === 0 ? (
+                  <div className="empty-state">
+                    <h3>✨ Welcome to Lumi Chat!</h3>
+                    <p>Share your thoughts and let the warm light of conversation begin! 🌟</p>
+                  </div>
+                ) : (
+                  messages.map(message => (
                 <div
                   key={message.id}
                   data-message-id={message.id}
@@ -1777,7 +1808,13 @@ function App() {
                       size={24}
                       className="message-avatar"
                     />
-                    <span className="message-username">{message.username}</span>
+                    <span
+                      className={`message-username ${message.username !== username ? 'clickable' : ''}`}
+                      onClick={() => message.username !== username && startDMWithUser(message.username)}
+                      title={message.username !== username ? `Send message to ${message.username}` : undefined}
+                    >
+                      {message.username}
+                    </span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
                     <button
                       className="reply-btn"
@@ -1849,7 +1886,9 @@ function App() {
                 onlineUsers.map(user => (
                   <div
                     key={user.username}
-                    className={`online-user ${user.username === username ? 'current-user' : ''} ${user.type === 'ai' ? 'ai-user' : 'human-user'}`}
+                    className={`online-user ${user.username === username ? 'current-user' : ''} ${user.type === 'ai' ? 'ai-user' : 'human-user'} ${user.username !== username ? 'clickable' : ''}`}
+                    onClick={() => user.username !== username && startDMWithUser(user.username)}
+                    title={user.username !== username ? `Send message to ${user.username}` : undefined}
                   >
                     <div className="user-status">
                       <span className={`status-indicator ${user.type === 'ai' ? 'ai-indicator' : 'status-dot'}`}>
@@ -1860,9 +1899,14 @@ function App() {
                         <span className="user-type-label">({user.description})</span>
                       )}
                     </div>
-                    {user.username === username && (
-                      <span className="you-label">(you)</span>
-                    )}
+                    <div className="user-actions">
+                      {user.username === username && (
+                        <span className="you-label">(you)</span>
+                      )}
+                      {user.username !== username && (
+                        <span className="dm-hint">💬</span>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
@@ -1993,6 +2037,8 @@ function App() {
           </div>
         </div>
       </form>
+        </>
+      )}
 
       {/* Image Preview Modal */}
       {selectedImage && (
@@ -2037,6 +2083,10 @@ function App() {
   )
 }
 
+// Main App Component
+function App() {
+  return <MainChat />
+}
 // Create QueryClient instance with optimized settings for avatar caching
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -2058,6 +2108,7 @@ const AppWithQueryClient = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <App />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }
