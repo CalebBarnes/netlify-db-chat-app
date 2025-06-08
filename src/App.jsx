@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
@@ -2036,4 +2037,29 @@ function App() {
   )
 }
 
-export default App
+// Create QueryClient instance with optimized settings for avatar caching
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Cache avatars for 5 minutes before considering them stale
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      // Keep avatars in cache for 10 minutes after they become unused
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      // Retry failed requests up to 2 times
+      retry: 2,
+      // Don't refetch on window focus for avatars (they don't change often)
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+
+// App wrapper with QueryClient provider
+const AppWithQueryClient = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  )
+}
+
+export default AppWithQueryClient
