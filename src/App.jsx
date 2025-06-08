@@ -844,11 +844,29 @@ function App() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const users = await response.json()
+      const humanUsers = await response.json()
 
-      // Detect new users coming online (for sound notification)
-      const previousUsernames = onlineUsers.map(user => user.username)
-      const currentUsernames = users.map(user => user.username)
+      // Define AI assistants that should always appear in the list
+      const aiAssistants = [
+        {
+          username: 'Lumi',
+          type: 'ai',
+          status: 'online',
+          indicator: '⭐',
+          description: 'AI Assistant',
+          is_typing: false,
+          last_seen: new Date().toISOString()
+        }
+      ]
+
+      // Combine AI assistants with human users (AI assistants first)
+      const allUsers = [...aiAssistants, ...humanUsers]
+
+      // Detect new users coming online (for sound notification) - only for human users
+      const previousUsernames = onlineUsers
+        .filter(user => user.type !== 'ai')
+        .map(user => user.username)
+      const currentUsernames = humanUsers.map(user => user.username)
       const newUsers = currentUsernames.filter(u =>
         !previousUsernames.includes(u) && u !== username.trim()
       )
@@ -858,10 +876,10 @@ function App() {
         playUserOnlineSound()
       }
 
-      setOnlineUsers(users)
+      setOnlineUsers(allUsers)
 
-      // Extract typing users (excluding current user)
-      const currentlyTyping = users
+      // Extract typing users (excluding current user and AI assistants)
+      const currentlyTyping = humanUsers
         .filter(user => user.is_typing && user.username !== username.trim())
         .map(user => user.username)
       setTypingUsers(currentlyTyping)
@@ -1665,11 +1683,16 @@ function App() {
                 onlineUsers.map(user => (
                   <div
                     key={user.username}
-                    className={`online-user ${user.username === username ? 'current-user' : ''}`}
+                    className={`online-user ${user.username === username ? 'current-user' : ''} ${user.type === 'ai' ? 'ai-user' : 'human-user'}`}
                   >
                     <div className="user-status">
-                      <span className="status-dot"></span>
+                      <span className={`status-indicator ${user.type === 'ai' ? 'ai-indicator' : 'status-dot'}`}>
+                        {user.type === 'ai' ? user.indicator : ''}
+                      </span>
                       <span className="username">{user.username}</span>
+                      {user.type === 'ai' && (
+                        <span className="user-type-label">({user.description})</span>
+                      )}
                     </div>
                     {user.username === username && (
                       <span className="you-label">(you)</span>
