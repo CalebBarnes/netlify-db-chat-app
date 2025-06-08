@@ -12,10 +12,18 @@ const headers = {
 
 // Get the avatar blob store
 function getAvatarStore() {
-  return getStore({
+  const storeOptions = {
     name: "avatars",
     consistency: "strong",
-  });
+  };
+
+  // For local development, manually provide siteID and token
+  if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_TOKEN) {
+    storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+    storeOptions.token = process.env.NETLIFY_TOKEN;
+  }
+
+  return getStore(storeOptions);
 }
 
 // Generate unique key for avatar
@@ -128,7 +136,9 @@ export const handler = async (event) => {
     // Save or update avatar in database
     await sql`
       INSERT INTO user_avatars (username, avatar_url, original_filename, file_size, uploaded_at, updated_at)
-      VALUES (${username.trim()}, ${avatarUrl}, ${filename}, ${fileBuffer.length}, NOW(), NOW())
+      VALUES (${username.trim()}, ${avatarUrl}, ${filename}, ${
+      fileBuffer.length
+    }, NOW(), NOW())
       ON CONFLICT (username) 
       DO UPDATE SET
         avatar_url = EXCLUDED.avatar_url,
@@ -150,7 +160,10 @@ export const handler = async (event) => {
     console.error("Avatar upload error:", error);
 
     // Return appropriate error message
-    if (error.message.includes("file size") || error.message.includes("file type")) {
+    if (
+      error.message.includes("file size") ||
+      error.message.includes("file type")
+    ) {
       return {
         statusCode: 400,
         headers,

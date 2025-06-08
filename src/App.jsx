@@ -505,6 +505,7 @@ function App() {
   // Avatar upload states
   const [showAvatarUpload, setShowAvatarUpload] = useState(false)
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null)
+  const [avatarRefreshTrigger, setAvatarRefreshTrigger] = useState(0)
 
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
@@ -1463,6 +1464,8 @@ function App() {
 
   const handleAvatarUpdate = (newAvatarUrl) => {
     setCurrentUserAvatar(newAvatarUrl)
+    // Force Avatar component to re-fetch by updating a trigger
+    setAvatarRefreshTrigger(Date.now())
   }
 
   const handleAvatarUploadClick = () => {
@@ -1574,6 +1577,7 @@ function App() {
                   username={username}
                   size={24}
                   className="header-avatar"
+                  key={avatarRefreshTrigger}
                 />
                 <ChevronDown size={14} className="dropdown-arrow" />
               </button>
@@ -1767,6 +1771,11 @@ function App() {
                   )}
 
                   <div className="message-header">
+                    <Avatar
+                      username={message.username}
+                      size={24}
+                      className="message-avatar"
+                    />
                     <span className="message-username">{message.username}</span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
                     <button

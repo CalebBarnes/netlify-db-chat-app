@@ -9,10 +9,18 @@ const headers = {
 
 // Get the avatar blob store
 function getAvatarStore() {
-  return getStore({
+  const storeOptions = {
     name: "avatars",
     consistency: "strong",
-  });
+  };
+
+  // For local development, manually provide siteID and token
+  if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_TOKEN) {
+    storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+    storeOptions.token = process.env.NETLIFY_TOKEN;
+  }
+
+  return getStore(storeOptions);
 }
 
 // Helper function to get content type from filename

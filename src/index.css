@@ -797,10 +797,15 @@ body {
 
 .message-header {
   display: flex;
-  align-items: baseline; /* Align username and timestamp on baseline */
+  align-items: center; /* Changed to center for avatar alignment */
   margin-bottom: 4px; /* Tighter spacing */
   font-size: 12px;
   gap: 8px;
+}
+
+.message-avatar {
+  flex-shrink: 0; /* Prevent avatar from shrinking */
+  margin-right: 4px; /* Small gap between avatar and username */
 }
 
 .message-username {
