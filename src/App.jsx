@@ -23,11 +23,29 @@ renderer.paragraph = (text) => {
   return `<p>${text}</p>`
 }
 
-// Detect @mentions in message text
-const detectMentions = (message) => {
-  const mentionRegex = /@([a-zA-Z0-9_-]+)/g
-  const matches = message.match(mentionRegex) || []
-  return matches.map(match => match.substring(1)) // Remove @ symbol
+// Detect @mentions in message text (only for actual users)
+const detectMentions = (message, validUsernames = []) => {
+  if (!validUsernames.length) return []
+
+  const mentions = []
+
+  // Create regex patterns for each valid username
+  validUsernames.forEach(username => {
+    const escapedUsername = escapeRegex(username)
+    // Match @username with word boundaries (space, punctuation, start/end of string)
+    const userRegex = new RegExp(`@(${escapedUsername})(?=\\s|$|[^a-zA-Z0-9_\\s-])`, 'gi')
+    const matches = message.match(userRegex)
+    if (matches) {
+      matches.forEach(match => {
+        const mentionedUser = match.substring(1) // Remove @ symbol
+        if (!mentions.includes(mentionedUser)) {
+          mentions.push(mentionedUser)
+        }
+      })
+    }
+  })
+
+  return mentions
 }
 
 // Check if current user is mentioned
@@ -245,27 +263,27 @@ const escapeRegex = (string) => {
 }
 
 // Secure markdown renderer with DOMPurify sanitization and mention highlighting
-const renderMarkdown = (text, currentUser = '') => {
+const renderMarkdown = (text, currentUser = '', validUsernames = []) => {
   if (!text) return ''
 
   try {
     // First highlight @mentions before markdown processing
     let processedText = text
-    if (currentUser) {
-      // Escape special regex characters in username for safe regex construction
-      const escapedUser = escapeRegex(currentUser)
 
-      // Highlight mentions of the current user
-      const mentionRegex = new RegExp(`@(${escapedUser})\\b`, 'gi')
-      processedText = processedText.replace(mentionRegex, '<mark class="mention-highlight">@$1</mark>')
+    if (validUsernames.length > 0) {
+      // Highlight mentions for all valid users
+      validUsernames.forEach(username => {
+        const escapedUsername = escapeRegex(username)
+        // Match @username with proper word boundaries
+        const userRegex = new RegExp(`@(${escapedUsername})(?=\\s|$|[^a-zA-Z0-9_\\s-])`, 'gi')
 
-      // Highlight other mentions with a different style
-      const otherMentionRegex = /@([a-zA-Z0-9_-]+)/g
-      processedText = processedText.replace(otherMentionRegex, (match, username) => {
         if (username.toLowerCase() === currentUser.toLowerCase()) {
-          return match // Already highlighted above
+          // Highlight current user mentions with special styling
+          processedText = processedText.replace(userRegex, '<mark class="mention-highlight">@$1</mark>')
+        } else {
+          // Highlight other user mentions with regular styling
+          processedText = processedText.replace(userRegex, '<span class="mention">@$1</span>')
         }
-        return `<span class="mention">@${username}</span>`
       })
     }
 
@@ -306,6 +324,7 @@ function App() {
   const [lastMessageTime, setLastMessageTime] = useState(null)
   const [lastMessageId, setLastMessageId] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState([])
+  const [allKnownUsernames, setAllKnownUsernames] = useState([])
   // Initialize sidebar state based on screen size - closed on mobile, open on desktop
   const [showSidebar, setShowSidebar] = useState(() => {
     // Check if we're on mobile (screen width < 768px)
@@ -352,6 +371,32 @@ function App() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // Extract all known usernames from messages and online users
+  const updateKnownUsernames = useCallback(() => {
+    const usernames = new Set()
+
+    // Add usernames from messages
+    messages.forEach(message => {
+      if (message.username) {
+        usernames.add(message.username)
+      }
+    })
+
+    // Add usernames from online users
+    onlineUsers.forEach(user => {
+      if (user.username) {
+        usernames.add(user.username)
+      }
+    })
+
+    setAllKnownUsernames(Array.from(usernames))
+  }, [messages, onlineUsers])
+
+  // Update known usernames when messages or online users change
+  useEffect(() => {
+    updateKnownUsernames()
+  }, [updateKnownUsernames])
 
   // Load saved username from localStorage on app startup
   useEffect(() => {
@@ -619,7 +664,7 @@ function App() {
             trulyNewMessages.forEach(message => {
               // Don't notify for own messages
               if (message.username !== username.trim()) {
-                const mentions = detectMentions(message.message)
+                const mentions = detectMentions(message.message, allKnownUsernames)
                 if (isUserMentioned(mentions, username.trim())) {
                   // Play mention sound and show notification
                   if (soundSettings.enabled && soundSettings.mentionSounds) {
@@ -1330,7 +1375,7 @@ function App() {
                   </div>
                   <div
                     className="message-content"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message, username) }}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(message.message, username, allKnownUsernames) }}
                   />
 
                   {/* Display image if message has one */}
