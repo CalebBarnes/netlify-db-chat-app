@@ -300,6 +300,14 @@ const DMChat = ({
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter without Shift = send message
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSendMessage(e)
+              }
+              // Shift+Enter = line break (default textarea behavior, no need to handle)
+            }}
             placeholder={`Message ${otherUsername}... (Shift+Enter for line breaks)`}
             disabled={submitting}
             className="message-input"
