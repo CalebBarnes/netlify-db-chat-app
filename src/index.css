@@ -428,7 +428,26 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+}
+
+/* Header action groups for better organization */
+.header-actions-primary,
+.header-actions-secondary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-actions-primary {
+  /* Primary actions: GitHub link, Users toggle */
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  padding-right: 16px;
+}
+
+.header-actions-secondary {
+  /* Secondary actions: Settings, Logout */
+  gap: 8px;
 }
 
 .header::before {

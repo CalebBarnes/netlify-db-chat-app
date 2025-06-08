@@ -5,7 +5,7 @@ import ThemeToggle from './ThemeToggle'
 import ImageUpload from './ImageUpload'
 import ImagePreview from './ImagePreview'
 // 🚨 ICON SYSTEM: Replace emojis with proper Lucide icons for clarity
-import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, ExternalLink } from 'lucide-react'
+import { Reply, Send, X, Settings, Users, LogOut, Plus, Upload, Github } from 'lucide-react'
 
 // Configure marked for safe rendering with proper line break handling
 marked.setOptions({
@@ -1320,41 +1320,50 @@ function App() {
             <div className="user-count">
               <Users size={16} /> {onlineUsers.length} online
             </div>
-            <a
-              href="https://github.com/CalebBarnes/netlify-db-chat-app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-link"
-              aria-label="View source code on GitHub"
-              title="View source code on GitHub"
-            >
-              <ExternalLink size={18} />
-            </a>
-            <button
-              className="settings-btn"
-              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-              aria-label={showSettingsMenu ? 'Close settings menu' : 'Open settings menu'}
-              aria-expanded={showSettingsMenu}
-              title="Settings"
-            >
-              <Settings size={18} />
-            </button>
-            <button
-              className="logout-btn"
-              onClick={handleLogout}
-              aria-label="Logout and clear saved profile"
-              title="Logout"
-            >
-              <LogOut size={18} />
-            </button>
-            <button
-              className="sidebar-toggle"
-              onClick={() => setShowSidebar(!showSidebar)}
-              aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
-              aria-expanded={showSidebar}
-            >
-              <Users size={18} />
-            </button>
+
+            {/* Primary actions group */}
+            <div className="header-actions-primary">
+              <a
+                href="https://github.com/CalebBarnes/netlify-db-chat-app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="github-link"
+                aria-label="View source code on GitHub"
+                title="View source code on GitHub"
+              >
+                <Github size={18} />
+              </a>
+              <button
+                className="sidebar-toggle"
+                onClick={() => setShowSidebar(!showSidebar)}
+                aria-label={showSidebar ? 'Close online users panel' : 'Open online users panel'}
+                aria-expanded={showSidebar}
+                title="Online Users"
+              >
+                <Users size={18} />
+              </button>
+            </div>
+
+            {/* Secondary actions group */}
+            <div className="header-actions-secondary">
+              <button
+                className="settings-btn"
+                onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                aria-label={showSettingsMenu ? 'Close settings menu' : 'Open settings menu'}
+                aria-expanded={showSettingsMenu}
+                title="Settings"
+              >
+                <Settings size={18} />
+              </button>
+              <button
+                className="logout-btn"
+                onClick={handleLogout}
+                aria-label="Logout and clear saved profile"
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
