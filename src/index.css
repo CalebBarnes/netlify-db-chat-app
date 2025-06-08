@@ -1937,7 +1937,7 @@ body {
 }
 
 .own-message .message-content a {
-  color: rgba(255, 255, 255, 0.9);
+  color: #667eea !important; /* Use proper link color even in current user messages */
 }
 
 .message-content a:hover {
@@ -2119,6 +2119,35 @@ body {
 }
 
 .settings-btn:active {
+  transform: translateY(0);
+}
+
+/* GitHub Link */
+.github-link {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: 8px;
+}
+
+.github-link:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.github-link:active {
   transform: translateY(0);
 }
 
