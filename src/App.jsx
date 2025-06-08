@@ -2083,6 +2083,7 @@ function MainChat() {
   )
 }
 
+<<<<<<< HEAD
 // DM Route Component
 function DMRoute() {
   const { username: targetUsername } = useParams()
@@ -2154,6 +2155,8 @@ function App() {
   )
 }
 
+=======
+>>>>>>> origin/main
 // Create QueryClient instance with optimized settings for avatar caching
 const queryClient = new QueryClient({
   defaultOptions: {

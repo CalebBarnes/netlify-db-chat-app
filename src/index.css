@@ -2171,9 +2171,7 @@ body {
   font-size: 0.9em;
 }
 
-.own-message .message-content code {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* Removed: .own-message .message-content code override - use consistent styling */
 
 .message-content pre {
   background: rgba(0, 0, 0, 0.05);
@@ -2184,10 +2182,7 @@ body {
   border-left: 3px solid rgba(102, 126, 234, 0.3);
 }
 
-.own-message .message-content pre {
-  background: rgba(255, 255, 255, 0.1);
-  border-left-color: rgba(255, 255, 255, 0.4);
-}
+/* Removed: .own-message .message-content pre override - use consistent styling */
 
 .message-content pre code {
   background: none;
@@ -2203,9 +2198,7 @@ body {
   opacity: 0.9;
 }
 
-.own-message .message-content blockquote {
-  border-left-color: rgba(255, 255, 255, 0.4);
-}
+/* Removed: .own-message .message-content blockquote override - use consistent styling */
 
 .message-content ul,
 .message-content ol {
@@ -2251,11 +2244,7 @@ body {
   animation: mentionPulse 0.5s ease-out;
 }
 
-.own-message .mention-highlight {
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
+/* Removed: .own-message .mention-highlight override - use consistent styling */
 
 /* 🚨 DISCORD-STYLE: High-contrast mention colors for all themes */
 .mention {
