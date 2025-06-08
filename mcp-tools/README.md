@@ -7,7 +7,7 @@ An MCP (Model Context Protocol) tool that allows Lumi to interact with the chat 
 - **Send Messages**: Send messages to the chat as Lumi
 - **Read Messages**: Get recent chat messages with filtering options
 - **Check Mentions**: Find @Lumi mentions and replies to Lumi messages
-- **Online Users**: Get list of currently online users with typing status
+- **Online Users**: Get a list of currently online users with typing status
 
 ## Installation
 
@@ -82,7 +82,7 @@ Check for @Lumi mentions and replies in recent messages.
 
 ### 4. get_online_users
 
-Get list of currently online users with their status.
+Get a list of currently online users with their status.
 
 **Parameters:** None
 
