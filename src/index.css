@@ -833,6 +833,30 @@ body {
   transition: color 0.3s ease;
 }
 
+.message-username.clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.message-username.clickable:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+}
+
+.message-username.clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.message-username.clickable:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+}
+
 .own-message .message-username {
   color: var(--text-username-own);
 }
@@ -977,6 +1001,54 @@ body {
 
 .online-user.current-user {
   background: var(--border-secondary);
+}
+
+.online-user.clickable {
+  cursor: pointer;
+}
+
+.online-user.clickable:hover {
+  background: var(--bg-tertiary);
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dm-hint {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.online-user.clickable:hover .dm-hint {
+  opacity: 1;
+}
+
+.online-user.clickable {
+  cursor: pointer;
+}
+
+.online-user.clickable:hover {
+  background: var(--bg-tertiary);
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dm-hint {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.online-user.clickable:hover .dm-hint {
+  opacity: 1;
 }
 
 .user-status {
@@ -2434,6 +2506,40 @@ body {
   transform: translateY(0);
 }
 
+/* DM Button */
+.dm-button {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 44px;
+  min-height: 44px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dm-button:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-color: var(--border-focus);
+}
+
+.dm-button:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.dm-button:active {
+  transform: translateY(0);
+}
+
 /* Image Preview Styles */
 .image-preview-container {
   position: fixed;
@@ -3180,4 +3286,501 @@ body {
 
 .upload-guidelines li {
   margin-bottom: 4px;
+}
+
+/* Direct Messages Styles */
+.direct-messages {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dm-main {
+  display: flex;
+  height: 100vh;
+}
+
+.dm-sidebar {
+  width: 300px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.dm-welcome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+}
+
+.welcome-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.welcome-content h2 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.welcome-content p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.start-conversation-button,
+.back-to-chat-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.start-conversation-button {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.start-conversation-button:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.back-to-chat-button {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.back-to-chat-button:hover {
+  background: var(--bg-tertiary);
+}
+
+/* DM Conversation List */
+.dm-conversation-list {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.dm-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.new-dm-button {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.new-dm-button:hover {
+  background: var(--accent-secondary);
+  transform: scale(1.1);
+}
+
+.conversation-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.conversation-item.selected {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.conversation-avatar {
+  position: relative;
+  margin-right: 0.75rem;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.conversation-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.other-username {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.last-message-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.last-message {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.last-sender {
+  font-weight: 500;
+}
+
+.no-conversations {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.start-dm-button {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.start-dm-button:hover {
+  background: var(--accent-secondary);
+}
+
+/* DM Chat Interface */
+.dm-chat {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+.dm-chat .dm-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  gap: 1rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background: var(--bg-tertiary);
+}
+
+.dm-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dm-header-info .other-username {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+/* DM messages now use the same styling as main chat messages */
+
+.no-messages {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+/* DM input now uses the same styling as main chat input (.message-form) */
+
+.reply-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  padding: 0.5rem;
+  border-radius: 6px 6px 0 0;
+  border-left: 3px solid var(--accent-primary);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cancel-reply {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-reply:hover {
+  background: var(--bg-secondary);
+}
+
+/* New DM Dialog */
+.new-dm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.new-dm-dialog {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dialog-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dialog-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-section {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.user-search-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.users-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.user-item:hover {
+  background: var(--bg-secondary);
+}
+
+.user-avatar {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 0.7rem;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.username {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.status-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.user-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.no-users {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cancel-button {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: var(--bg-tertiary);
+}
+
+.loading-section,
+.error-section {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.retry-button {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background: var(--accent-secondary);
 }
