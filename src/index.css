@@ -428,7 +428,155 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+}
+
+/* User avatar container for dropdown positioning */
+.user-avatar-container {
+  position: relative; /* Container for dropdown positioning */
+}
+
+/* User avatar button */
+.user-avatar-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.user-avatar-button:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-primary);
+  transform: translateY(-1px);
+}
+
+.user-avatar-button .user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  color: var(--text-inverse);
+}
+
+.user-avatar-button .dropdown-arrow {
+  transition: transform 0.2s ease;
+}
+
+.user-avatar-button[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* User menu dropdown */
+.user-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+}
+
+.user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  min-width: 220px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.user-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.user-menu-header .user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  color: var(--text-inverse);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.user-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.user-menu-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0;
+}
+
+.user-menu-actions {
+  padding: 8px;
+}
+
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  text-align: left;
+}
+
+.user-menu-item:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.user-menu-item.logout {
+  color: var(--error-text);
+}
+
+.user-menu-item.logout:hover {
+  background: var(--error-bg);
+  color: var(--error-text);
 }
 
 .header::before {
@@ -458,11 +606,7 @@ body {
   text-align: left;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
+
 
 .header h1 {
   font-size: 2.2rem;
@@ -480,13 +624,7 @@ body {
   font-weight: 600;
 }
 
-.user-count {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
+/* User count is now shown in sidebar toggle tooltip */
 
 .logout-btn {
   background: rgba(255, 255, 255, 0.2);
@@ -1772,9 +1910,7 @@ body {
     transform: translateY(-2px);
   }
 
-  .user-count {
-    display: none;
-  }
+  /* User count is now in tooltip, no need to hide */
 
   .typing-indicator-dedicated {
     min-height: 32px; /* Smaller on mobile to save space */

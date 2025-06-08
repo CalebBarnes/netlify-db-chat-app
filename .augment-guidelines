@@ -41,7 +41,7 @@ This file contains important context and memories from previous interactions to 
 - User prefers to propose brand identity and styling changes in GitHub issues first to get feedback before implementing them.
 - User prefers to use feature branches and pull requests for new features rather than committing directly to main branch.
 - When creating new feature branches, always pull latest changes from main branch first to ensure the feature branch is based on the most recent code, preventing merge conflicts and ensuring all recent changes are included.
-- User prefers to read PR feedback, merge when ready and good, and expects me to understand the correct merge order without asking, then work on next issues using new feature branches for each task.
+- User prefers to read PR feedback, merge when ready and good, and expects me to understand the correct merge order (prioritize older PRs first by creation date, unless there are dependency conflicts), then work on next issues using new feature branches for each task.
 - User prefers to check PR feedback from automated code review tools (like CodeRabbit) and ensure all feedback is addressed before merging PRs.
 - User prefers to check PR feedback thoroughly before merging PRs to ensure all review comments are addressed.
 - User prefers to verify PRs are thoroughly reviewed and confirmed good before merging PRs.
