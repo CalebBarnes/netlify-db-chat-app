@@ -39,10 +39,23 @@ export const handler = async (event) => {
       };
     }
 
+    // Additional username validation
+    if (
+      typeof username !== "string" ||
+      username.trim().length === 0 ||
+      username.length > 50
+    ) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: "Invalid username format" }),
+      };
+    }
+
     // Fetch all chat state data in parallel for better performance
     const [messagesResult, presenceResult] = await Promise.all([
       fetchMessages(sinceId),
-      fetchPresenceAndTyping()
+      fetchPresenceAndTyping(),
     ]);
 
     return {
@@ -52,7 +65,7 @@ export const handler = async (event) => {
         messages: messagesResult,
         presence: presenceResult.users,
         typing: presenceResult.typing,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
     };
   } catch (error) {
@@ -72,7 +85,7 @@ export const handler = async (event) => {
 async function fetchMessages(sinceId) {
   try {
     let messages;
-    
+
     if (sinceId) {
       // Get messages with ID greater than sinceId (for real-time polling)
       messages = await sql`
@@ -110,18 +123,22 @@ async function fetchPresenceAndTyping() {
       ORDER BY username ASC
     `;
 
-    // Extract typing users
-    const typingUsers = users
-      .filter(user => user.is_typing)
-      .map(user => user.username);
-
-    return {
-      users: users.map(user => ({
+    // Extract typing users in a single pass
+    const typingUsers = [];
+    const processedUsers = users.map((user) => {
+      if (user.is_typing) {
+        typingUsers.push(user.username);
+      }
+      return {
         username: user.username,
         last_seen: user.last_seen,
-        is_typing: user.is_typing
-      })),
-      typing: typingUsers
+        is_typing: user.is_typing,
+      };
+    });
+
+    return {
+      users: processedUsers,
+      typing: typingUsers,
     };
   } catch (error) {
     console.error("Error fetching presence:", error);

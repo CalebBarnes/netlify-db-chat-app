@@ -653,7 +653,7 @@ function MainChat() {
           fetchOnlineUsers() // Still need presence for sidebar
         }
         updatePresence() // Always update our own presence
-      }, 1500) // Poll every 1.5 seconds - balance between real-time feel and cost
+      }, 2000) // Poll every 2 seconds - optimal balance for 50% request reduction
 
       // Initial data fetch
       updatePresence()
