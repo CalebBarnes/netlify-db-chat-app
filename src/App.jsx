@@ -607,10 +607,12 @@ function MainChat() {
     }
   }, [isUsernameSet])
 
-  // Fetch initial messages on component mount
+  // Fetch initial messages when username is set
   useEffect(() => {
-    fetchMessages()
-  }, [])
+    if (isUsernameSet) {
+      fetchMessages()
+    }
+  }, [isUsernameSet])
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -799,7 +801,7 @@ function MainChat() {
         // For DM conversations, get messages for specific conversation
         try {
           const conversationId = await getOrCreateConversationId(dmTargetUsername)
-          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}`
+          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&username=${encodeURIComponent(username.trim())}`
         } catch (error) {
           console.error('Error getting conversation ID:', error)
           setError('Failed to load conversation')
@@ -838,7 +840,7 @@ function MainChat() {
       if (isInDMConversation) {
         try {
           const conversationId = await getOrCreateConversationId(dmTargetUsername)
-          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&sinceId=${lastMessageIdRef.current}`
+          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&username=${encodeURIComponent(username.trim())}&sinceId=${lastMessageIdRef.current}`
         } catch (error) {
           console.error('Error getting conversation ID for new messages:', error)
           return
@@ -1071,23 +1073,47 @@ function MainChat() {
   // Helper function to get or create conversation ID for DMs
   const getOrCreateConversationId = async (targetUsername) => {
     try {
-      const response = await fetch('/.netlify/functions/dm-conversation', {
+      // First, try to get existing conversations to find this one
+      const conversationsResponse = await fetch(
+        `/.netlify/functions/direct-messages?username=${encodeURIComponent(username.trim())}`
+      )
+
+      if (conversationsResponse.ok) {
+        const conversations = await conversationsResponse.json()
+        const existingConversation = conversations.find(
+          conv => conv.other_username === targetUsername
+        )
+
+        if (existingConversation) {
+          return existingConversation.id
+        }
+      }
+
+      // If no existing conversation, create one by sending an initial message
+      const payload = {
+        username: username.trim(),
+        message: `Hi ${targetUsername}!`,
+        recipientUsername: targetUsername
+      }
+
+      console.log('Creating conversation with payload:', payload)
+
+      const createResponse = await fetch('/.netlify/functions/direct-messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: username.trim(),
-          targetUsername: targetUsername
-        }),
+        body: JSON.stringify(payload),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text()
+        console.error('Create conversation error response:', errorText)
+        throw new Error(`Failed to create conversation: ${createResponse.status} - ${errorText}`)
       }
 
-      const result = await response.json()
-      return result.conversationId
+      const newMessage = await createResponse.json()
+      return newMessage.conversation_id
     } catch (error) {
       console.error('Error getting/creating conversation:', error)
       throw error
@@ -1877,8 +1903,8 @@ function MainChat() {
         </>
       )}
 
-      {/* Main chat content - only show when not in DM mode */}
-      {!isInDMMode && (
+      {/* Main chat content - show for both main chat and DM modes */}
+      {true && (
         <>
           <div className="chat-container">
             <div className="messages-container">
@@ -2096,7 +2122,11 @@ function MainChat() {
           <textarea
             ref={messageInputRef}
             className="message-input"
-            placeholder="Type your message... (Shift+Enter for line breaks)"
+            placeholder={
+              isInDMConversation
+                ? `Message ${dmTargetUsername}... (Shift+Enter for line breaks)`
+                : "Type your message... (Shift+Enter for line breaks)"
+            }
             value={newMessage}
             onChange={handleMessageInputChange}
             onKeyDown={handleKeyDown}
@@ -2178,27 +2208,7 @@ function MainChat() {
         </div>
       )}
 
-      {/* DM Mode - render DM components when in DM routes */}
-      {isInDMMode && (
-        <>
-          {location.pathname === '/dm' ? (
-            <DirectMessages
-              username={username}
-              onBack={() => navigate('/')}
-              soundSettings={soundSettings}
-              playMessageSound={playMessageSound}
-            />
-          ) : location.pathname.startsWith('/dm/') ? (
-            <DMConversation
-              username={username}
-              targetUsername={decodeURIComponent(location.pathname.split('/dm/')[1])}
-              onBack={() => navigate('/dm')}
-              soundSettings={soundSettings}
-              playMessageSound={playMessageSound}
-            />
-          ) : null}
-        </>
-      )}
+      {/* DM Mode is now handled by the unified MainChat component through routing */}
 
       {/* Avatar Upload Modal */}
       {showAvatarUpload && (
