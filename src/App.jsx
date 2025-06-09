@@ -642,23 +642,30 @@ function MainChat() {
   // Set up real-time polling when username is set
   useEffect(() => {
     if (isUsernameSet) {
-      const messageInterval = setInterval(() => {
-        fetchNewMessages()
-      }, 1000) // Poll every 1 second for better real-time feel
+      // Combined polling for better performance - reduces requests by 50%
+      const combinedInterval = setInterval(() => {
+        if (!isInDMConversation) {
+          // Main chat: use combined endpoint for efficiency
+          fetchChatState()
+        } else {
+          // DM conversations: use separate polling for messages and presence
+          fetchNewMessages() // DM-specific message polling
+          fetchOnlineUsers() // Still need presence for sidebar
+        }
+        updatePresence() // Always update our own presence
+      }, 2000) // Poll every 2 seconds - optimal balance for 50% request reduction
 
-      const presenceInterval = setInterval(() => {
-        updatePresence()
-        fetchOnlineUsers()
-      }, 2000) // Update presence every 2 seconds for real-time typing indicators
-
-      // Initial presence update and user fetch
+      // Initial data fetch
       updatePresence()
-      fetchOnlineUsers()
+      if (!isInDMConversation) {
+        fetchChatState()
+      } else {
+        fetchOnlineUsers() // Need initial presence for DM mode
+      }
       fetchAllParticipants() // Load all participants for mentions
 
       return () => {
-        clearInterval(messageInterval)
-        clearInterval(presenceInterval)
+        clearInterval(combinedInterval)
         // Clear typing timeout and remove user from presence when component unmounts
         if (typingTimeoutRef.current) {
           clearTimeout(typingTimeoutRef.current)
@@ -667,7 +674,7 @@ function MainChat() {
         removePresence()
       }
     }
-  }, [isUsernameSet]) // Only depend on isUsernameSet
+  }, [isUsernameSet, isInDMConversation]) // Depend on both username and DM mode
 
   // Cleanup presence when page is closed
   useEffect(() => {
@@ -851,31 +858,26 @@ function MainChat() {
     }
   }
 
-  const fetchNewMessages = async () => {
+  // Combined function to fetch both messages and presence in one call
+  const fetchChatState = async () => {
     if (!lastMessageIdRef.current) return
 
     try {
-      // Choose endpoint based on chat mode
-      let endpoint = `/api/messages?sinceId=${lastMessageIdRef.current}`
-      if (isInDMConversation) {
-        try {
-          const conversationId = await getOrCreateConversationId(dmTargetUsername)
-          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&username=${encodeURIComponent(username.trim())}&sinceId=${lastMessageIdRef.current}`
-        } catch (error) {
-          console.error('Error getting conversation ID for new messages:', error)
-          return
-        }
-      }
+      // Use combined endpoint for main chat only (DMs still use separate polling)
+      const params = new URLSearchParams({
+        username: username.trim(),
+        sinceId: lastMessageIdRef.current.toString()
+      })
 
-      // Only get messages with ID greater than the last known message ID
-      const response = await fetch(endpoint)
+      const response = await fetch(`/.netlify/functions/chat-state?${params}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const newMessages = await response.json()
 
+      const { messages: newMessages, presence, typing } = await response.json()
+
+      // Handle new messages (same logic as before)
       if (newMessages.length > 0) {
-        // Use functional update to avoid stale closures and ensure proper deduplication
         setMessages(prev => {
           const existingIds = new Set(prev.map(msg => msg.id))
           const trulyNewMessages = newMessages.filter(msg => !existingIds.has(msg.id))
@@ -914,9 +916,99 @@ function MainChat() {
           return prev
         })
       }
+
+      // Handle presence updates (same logic as fetchOnlineUsers)
+      if (presence) {
+        // Define AI assistants that should always appear in the list
+        const aiAssistants = [
+          {
+            username: 'Lumi',
+            type: 'ai',
+            status: 'online',
+            indicator: '⭐',
+            description: 'AI Assistant',
+            is_typing: false,
+            last_seen: new Date().toISOString()
+          }
+        ]
+
+        // Combine AI assistants with human users (AI assistants first)
+        const allUsers = [...aiAssistants, ...presence]
+
+        // Detect new users coming online (for sound notification) - only for human users
+        const previousUsernames = onlineUsers
+          .filter(user => user.type !== 'ai')
+          .map(user => user.username)
+        const currentUsernames = presence.map(user => user.username)
+        const newUsers = currentUsernames.filter(u =>
+          !previousUsernames.includes(u) && u !== username.trim()
+        )
+
+        // Play user online sound for new users (but not on initial load)
+        if (onlineUsers.length > 0 && newUsers.length > 0 && soundSettings.enabled) {
+          playUserOnlineSound()
+        }
+
+        setOnlineUsers(allUsers)
+
+        // Update typing users
+        if (typing) {
+          const currentlyTyping = typing.filter(user => user !== username.trim())
+          setTypingUsers(currentlyTyping)
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching chat state:', err)
+      // Don't show error for polling failures to avoid spam
+    }
+  }
+
+  // Keep the old fetchNewMessages for DM conversations
+  const fetchNewMessages = async () => {
+    if (!lastMessageIdRef.current) return
+
+    try {
+      // This is now only used for DM conversations
+      let endpoint
+      if (isInDMConversation) {
+        try {
+          const conversationId = await getOrCreateConversationId(dmTargetUsername)
+          endpoint = `/.netlify/functions/direct-messages?conversationId=${conversationId}&username=${encodeURIComponent(username.trim())}&sinceId=${lastMessageIdRef.current}`
+        } catch (error) {
+          console.error('Error getting conversation ID for new messages:', error)
+          return
+        }
+      } else {
+        // Main chat now uses fetchChatState instead
+        return
+      }
+
+      const response = await fetch(endpoint)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const newMessages = await response.json()
+
+      if (newMessages.length > 0) {
+        setMessages(prev => {
+          const existingIds = new Set(prev.map(msg => msg.id))
+          const trulyNewMessages = newMessages.filter(msg => !existingIds.has(msg.id))
+
+          if (trulyNewMessages.length > 0) {
+            // Update refs with the latest message info
+            const latestMessage = trulyNewMessages[trulyNewMessages.length - 1]
+            lastMessageTimeRef.current = latestMessage.created_at
+            lastMessageIdRef.current = latestMessage.id
+            setLastMessageTime(latestMessage.created_at)
+            setLastMessageId(latestMessage.id)
+
+            return [...prev, ...trulyNewMessages]
+          }
+          return prev
+        })
+      }
     } catch (err) {
       console.error('Error fetching new messages:', err)
-      // Don't show error for polling failures to avoid spam
     }
   }
 
