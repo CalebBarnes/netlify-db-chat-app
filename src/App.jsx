@@ -528,6 +528,12 @@ function MainChat() {
   // Determine if we're in a specific DM conversation vs DM list
   const isInDMConversation = dmTargetUsername !== null
 
+  // Helper function to get the correct username field from a message
+  // Main chat messages use 'username', DM messages use 'sender_username'
+  const getMessageUsername = (message) => {
+    return message.sender_username || message.username
+  }
+
   const messagesEndRef = useRef(null)
   const messageInputRef = useRef(null)
   const lastMessageTimeRef = useRef(null)
@@ -607,12 +613,26 @@ function MainChat() {
     }
   }, [isUsernameSet])
 
-  // Fetch initial messages when username is set
+  // Clear messages and fetch new ones when route changes
   useEffect(() => {
     if (isUsernameSet) {
-      fetchMessages()
+      // Clear previous messages when switching between main chat and DMs
+      setMessages([])
+      setLastMessageId(null)
+      setLastMessageTime(null)
+      lastMessageIdRef.current = null
+      lastMessageTimeRef.current = null
+
+      // Only fetch messages if we're not on the DM list page
+      // DM list page (/dm) should not show any messages
+      if (!isInDMMode || isInDMConversation) {
+        fetchMessages()
+      } else {
+        // For DM list page, just set loading to false since we don't need to fetch messages
+        setLoading(false)
+      }
     }
-  }, [isUsernameSet])
+  }, [isUsernameSet, isInDMMode, dmTargetUsername])
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -1081,7 +1101,7 @@ function MainChat() {
       if (conversationsResponse.ok) {
         const conversations = await conversationsResponse.json()
         const existingConversation = conversations.find(
-          conv => conv.other_username === targetUsername
+          conv => conv.other_username && conv.other_username.toLowerCase() === targetUsername.toLowerCase()
         )
 
         if (existingConversation) {
@@ -1089,16 +1109,16 @@ function MainChat() {
         }
       }
 
-      // If no existing conversation, create one by sending an initial message
+      // If no existing conversation, create an empty one
       const payload = {
         username: username.trim(),
-        message: `Hi ${targetUsername}!`,
-        recipientUsername: targetUsername
+        recipientUsername: targetUsername,
+        createEmpty: true // Flag to create conversation without sending a message
       }
 
-      console.log('Creating conversation with payload:', payload)
+      console.log('Creating empty conversation with payload:', payload)
 
-      const createResponse = await fetch('/.netlify/functions/direct-messages', {
+      const createResponse = await fetch('/.netlify/functions/create-conversation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1112,8 +1132,8 @@ function MainChat() {
         throw new Error(`Failed to create conversation: ${createResponse.status} - ${errorText}`)
       }
 
-      const newMessage = await createResponse.json()
-      return newMessage.conversation_id
+      const result = await createResponse.json()
+      return result.conversation_id
     } catch (error) {
       console.error('Error getting/creating conversation:', error)
       throw error
@@ -1371,9 +1391,10 @@ function MainChat() {
 
   // Reply functionality handlers
   const handleReply = (message) => {
+    const messageUsername = getMessageUsername(message)
     const replyState = {
       id: message.id,
-      username: message.username,
+      username: messageUsername,
       message: message.message.substring(0, 100), // Preview first 100 chars
       mentionEnabled: true // Default to ON
     }
@@ -1381,9 +1402,9 @@ function MainChat() {
     setReplyingTo(replyState)
 
     // Auto-add @username to message input if mention enabled
-    if (replyState.mentionEnabled && !newMessage.includes(`@${message.username}`)) {
+    if (replyState.mentionEnabled && !newMessage.includes(`@${messageUsername}`)) {
       const currentMessage = newMessage.trim()
-      const mentionText = `@${message.username} `
+      const mentionText = `@${messageUsername} `
       setNewMessage(currentMessage ? `${mentionText}${currentMessage}` : mentionText)
     }
 
@@ -1903,23 +1924,41 @@ function MainChat() {
         </>
       )}
 
-      {/* Main chat content - show for both main chat and DM modes */}
-      {true && (
+      {/* Conditional content based on route */}
+      {isInDMMode && !isInDMConversation ? (
+        // DM List View - show conversation list
+        <DirectMessages
+          username={username}
+          onBack={() => navigate('/')}
+          soundSettings={soundSettings}
+          playMessageSound={playMessageSound}
+        />
+      ) : (
+        // Main chat or DM conversation - show messages
         <>
           <div className="chat-container">
             <div className="messages-container">
               <div className="messages-list">
                 {messages.length === 0 ? (
                   <div className="empty-state">
-                    <h3>✨ Welcome to Lumi Chat!</h3>
-                    <p>Share your thoughts and let the warm light of conversation begin! 🌟</p>
+                    {isInDMConversation ? (
+                      <>
+                        <h3>💬 Start a conversation</h3>
+                        <p>Send a message to {dmTargetUsername} to begin your conversation!</p>
+                      </>
+                    ) : (
+                      <>
+                        <h3>✨ Welcome to Lumi Chat!</h3>
+                        <p>Share your thoughts and let the warm light of conversation begin! 🌟</p>
+                      </>
+                    )}
                   </div>
                 ) : (
                   messages.map(message => (
                 <div
                   key={message.id}
                   data-message-id={message.id}
-                  className={`message ${message.username === username ? 'own-message' : ''}`}
+                  className={`message ${getMessageUsername(message) === username ? 'own-message' : ''}`}
                 >
                   {/* Show compact reply reference if this is a reply - Discord style */}
                   {message.reply_to_id && (
@@ -1938,23 +1977,23 @@ function MainChat() {
 
                   <div className="message-header">
                     <Avatar
-                      username={message.username}
+                      username={getMessageUsername(message)}
                       size={24}
                       className="message-avatar"
                     />
                     <span
-                      className={`message-username ${message.username !== username ? 'clickable' : ''}`}
-                      onClick={() => message.username !== username && startDMWithUser(message.username)}
-                      title={message.username !== username ? `Send message to ${message.username}` : undefined}
+                      className={`message-username ${getMessageUsername(message) !== username ? 'clickable' : ''}`}
+                      onClick={() => getMessageUsername(message) !== username && startDMWithUser(getMessageUsername(message))}
+                      title={getMessageUsername(message) !== username ? `Send message to ${getMessageUsername(message)}` : undefined}
                     >
-                      {message.username}
+                      {getMessageUsername(message)}
                     </span>
                     <span className="message-time">{formatTime(message.created_at)}</span>
                     <button
                       className="reply-btn"
                       onClick={() => handleReply(message)}
-                      title={`Reply to ${message.username}`}
-                      aria-label={`Reply to ${message.username}'s message`}
+                      title={`Reply to ${getMessageUsername(message)}`}
+                      aria-label={`Reply to ${getMessageUsername(message)}'s message`}
                     >
                       <Reply size={14} />
                     </button>
@@ -1969,7 +2008,7 @@ function MainChat() {
                     <div className="message-image-container">
                       <img
                         src={message.image_url}
-                        alt={`Image from ${message.username}${message.image_filename ? ` – ${message.image_filename}` : ''}`}
+                        alt={`Image from ${getMessageUsername(message)}${message.image_filename ? ` – ${message.image_filename}` : ''}`}
                         className="message-image"
                         onClick={() => handleImageClick(message.image_url, message.image_filename)}
                         loading="lazy"

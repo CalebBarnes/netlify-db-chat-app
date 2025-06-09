@@ -29,7 +29,7 @@ const DMConversation = ({
         if (conversationsResponse.ok) {
           const conversations = await conversationsResponse.json()
           const existingConversation = conversations.find(
-            conv => conv.other_username === targetUsername
+            conv => conv.other_username && conv.other_username.toLowerCase() === targetUsername.toLowerCase()
           )
 
           if (existingConversation) {
@@ -39,15 +39,14 @@ const DMConversation = ({
           }
         }
 
-        // If no existing conversation, create one by sending an initial message
-        const createResponse = await fetch('/.netlify/functions/direct-messages', {
+        // If no existing conversation, create an empty one
+        const createResponse = await fetch('/.netlify/functions/create-conversation', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             username: username,
-            message: `👋 Hi ${targetUsername}!`,
             recipientUsername: targetUsername
           }),
         })
@@ -56,8 +55,8 @@ const DMConversation = ({
           throw new Error(`Failed to create conversation: ${createResponse.status}`)
         }
 
-        const newMessage = await createResponse.json()
-        setConversationId(newMessage.conversation_id)
+        const result = await createResponse.json()
+        setConversationId(result.conversation_id)
 
       } catch (err) {
         console.error('Error finding/creating conversation:', err)
